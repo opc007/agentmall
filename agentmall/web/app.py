@@ -170,9 +170,10 @@ def _png_chunk(tag: bytes, data: bytes) -> bytes:
 
 
 def _matrix_to_png(matrix, scale: int = 8) -> bytes:
-    """纯标准库把二维码矩阵编码成 PNG（8 位灰度，filter=None）。
+    """纯标准库把二维码矩阵编码成 PNG（8 位灰度，行 filter=None，0=黑/255=白）。
 
     matrix 是 qrcode 的 get_matrix()，**已经自带 2 模块的静区**，所以这里不再加边距。
+    注意纵向也要放大：每个矩阵行要重复 scale 次，否则行数对不上就成了坏图。
     """
     side = len(matrix) * scale
     blank = b"\xff" * scale
@@ -181,7 +182,7 @@ def _matrix_to_png(matrix, scale: int = 8) -> bytes:
         line = bytearray(b"\x00")  # 每行第一个字节是 filter type(0=None)
         for cell in row:
             line += b"\x00" * scale if cell else blank
-        rows.append(bytes(line))
+        rows.extend([bytes(line)] * scale)
     ihdr = struct.pack(">IIBBBBB", side, side, 8, 0, 0, 0, 0)
     return (b"\x89PNG\r\n\x1a\n"
             + _png_chunk(b"IHDR", ihdr)
@@ -470,8 +471,16 @@ def pay_page(request: Request, order_id: str, paid: int = 0):
 
 @router.get("/pay/{order_id}/qr.png")
 def pay_qr(request: Request, order_id: str):
-    """收银台二维码：内容 = 当前收银台页 URL（request.url），演示用，不含敏感信息。"""
-    return Response(content=qr_png(str(request.url)), media_type="image/png",
+    """收银台二维码：内容 = **收银台页 URL**，演示用，不含敏感信息。
+
+    注意不能直接用 `request.url`：本路由自己的 URL 是 `/pay/{id}/qr.png`，
+    直接编码的话扫出来是个 PNG 而不是收银台页。这里把 path 换回收银台页、
+    query（含 ?t= 演示 token）原样保留。
+    """
+    cashier_url = str(request.url.replace(path=f"/pay/{order_id}"))
+    if cashier_url.endswith("?"):
+        cashier_url = cashier_url[:-1]
+    return Response(content=qr_png(cashier_url), media_type="image/png",
                     headers={"Cache-Control": "no-store"})
 
 

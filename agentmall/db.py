@@ -108,12 +108,18 @@ def now() -> int:
 
 
 def connect() -> sqlite3.Connection:
-    """短连接。调用方负责 close（或用 with closing(...)）。"""
+    """短连接。调用方负责 close（或用 with closing(...)）。
+
+    PRAGMA 顺序有讲究：busy_timeout 必须**先**设，再设 journal_mode=WAL。
+    WAL 模式切换需要短暂排他锁，三个服务（用户面/MCP/管理后台）同时启动时
+    会撞车；busy_timeout 设晚了，WAL 那条语句本身就没有等待保护，
+    直接抛 "database is locked" 导致服务起不来。
+    """
     os.makedirs(os.path.dirname(DB_PATH) or ".", exist_ok=True)
     conn = sqlite3.connect(DB_PATH, timeout=15, check_same_thread=False)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA busy_timeout=15000")
+    conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     return conn
 
@@ -123,14 +129,24 @@ def init_db() -> None:
     with _init_lock:
         if _initialized:
             return
-        conn = connect()
-        try:
-            conn.executescript(SCHEMA)
-            conn.commit()
-            _seed(conn)
-        finally:
-            conn.close()
-        _initialized = True
+        # 三个服务同时启动时会并发建表/切 WAL，加退避重试兜底，
+        # 避免"database is locked"把服务直接打挂（路演现场起不来是最糟的失败）。
+        last: Exception | None = None
+        for attempt in range(5):
+            try:
+                conn = connect()
+                try:
+                    conn.executescript(SCHEMA)
+                    conn.commit()
+                    _seed(conn)
+                finally:
+                    conn.close()
+                _initialized = True
+                return
+            except sqlite3.OperationalError as exc:  # 锁冲突可重试
+                last = exc
+                time.sleep(0.4 * (attempt + 1))
+        raise last if last else RuntimeError("init_db 失败")
 
 
 def _seed(conn: sqlite3.Connection) -> None:
