@@ -1,0 +1,26 @@
+{% extends "admin_base.html" %}{% set nav='orders' %}
+{% block title %}全平台订单{% endblock %}
+{% block content %}
+<h2>🧾 全平台订单</h2>
+<div class="card">
+<form class="inline" method="get" action="/orders">
+  <span class="muted">按状态筛选：</span>
+  <select name="status">
+    <option value="">全部</option>
+    {% for s in ['待支付','待发货','待收货','已完成'] %}
+    <option value="{{ s }}" {{ 'selected' if status==s }}>{{ s }}</option>{% endfor %}
+  </select><button type="submit">筛选</button>
+  <span class="muted">共 {{ orders|length }} 笔 · 页面每 10 秒自动刷新</span>
+</form>
+</div>
+<div class="card">
+<table><tr><th>订单号</th><th>商品</th><th>金额</th><th>状态</th><th>地址（脱敏至市级）</th><th>演示单</th><th>时间</th></tr>
+{% for o in orders %}
+<tr><td>{{ o.order_id }}</td><td>{% for it in o['items'] %}{{ it.name }} ×{{ it.quantity }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td>
+<td>¥{{ "%.2f"|format(o.total) }}</td><td><span class="badge s-{{ o.status }}">{{ o.status }}</span></td>
+<td class="muted">{{ o.address_masked }}</td>
+<td>{{ '是' if o.is_demo else '否' }}</td><td class="muted">{{ o.created_at }}</td></tr>
+{% else %}<tr><td colspan="7" class="muted">没有符合条件的订单</td></tr>{% endfor %}
+</table></div>
+<script>setTimeout(function(){location.reload()},10000)</script>
+{% endblock %}

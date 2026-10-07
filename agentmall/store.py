@@ -102,8 +102,15 @@ class Store:
 
     # ---- 订单（辅助支付：只建单，不扣款） ----
     def create_order(self, product_id: str, quantity: int,
-                     address: str, note: str = "", user_id: str = "") -> dict:
-        """建单并扣库存。库存不足返回 error（防超卖）。"""
+                     address: str, note: str = "", user_id: str = "",
+                     is_demo: bool = True) -> dict:
+        """建单并扣库存。库存不足返回 error（防超卖）。
+
+        is_demo=True（默认，路演/演示用）：支付后直接置「已完成」且**不触发发货**
+        （未对接 1688，无真实履约），见 issue #2 与 demo/路演Demo流程.md。
+        is_demo=False：支付后进入「待发货」，供商户履约流使用
+        （待发货 → 待收货），见 docs/Phase2任务书.md §4 订单状态机。
+        """
         try:
             quantity = int(quantity)
         except (TypeError, ValueError):
@@ -139,6 +146,7 @@ class Store:
                 "quantity": quantity,
             }]
             ts = db.now()
+            is_demo = 1 if is_demo else 0
             # 扣库存 + 建单在同一个事务里，避免并发超卖
             with conn:
                 cur = conn.execute(
@@ -150,10 +158,10 @@ class Store:
                 conn.execute(
                     "INSERT INTO orders(id,user_id,items_json,total,address,note,"
                     "status,pay_url,is_demo,tracking_no,created_at) "
-                    "VALUES(?,?,?,?,?,?,?,?,1,'',?)",
+                    "VALUES(?,?,?,?,?,?,?,?,?,'',?)",
                     (order_id, user_id or None, json.dumps(items, ensure_ascii=False),
                      total, address.strip(), note or "", "待支付",
-                     charge.get("pay_url", ""), ts))
+                     charge.get("pay_url", ""), is_demo, ts))
             return {
                 "order_id": order_id,
                 "items": items,
@@ -163,7 +171,7 @@ class Store:
                 "status": "待支付",
                 # 占位收银台链接。演示环境，绝不伪装成真实支付；不做自动扣款。
                 "pay_url": charge.get("pay_url", ""),
-                "is_demo": True,
+                "is_demo": bool(is_demo),
                 "payment_gateway": charge.get("gateway", "mock"),
                 "created_at": ts,
             }
@@ -196,27 +204,29 @@ class Store:
         """用户点"确认支付"后置为已支付。
 
         checkout hands off：这一步只发生在用户自己的浏览器里，智能体不参与。
-        演示订单 is_demo=1，支付后不触发发货（无真实履约）。
+
+        状态机分两条（issue #2 与 Phase2任务书 §4 对演示单的处理不同，这里都满足）：
+          - is_demo=1（演示/路演单）：→「已完成」，**不触发发货**（无真实履约）
+          - is_demo=0（真实单）：→「待发货」，交由商户履约
         """
         db.init_db()
         conn = db.connect()
         try:
             with conn:
-                cur = conn.execute(
-                    "UPDATE orders SET status = '已完成' "
-                    "WHERE id = ? AND status = '待支付'",
-                    ((order_id or "").strip(),))
-                if cur.rowcount == 0:
-                    row = conn.execute("SELECT status FROM orders WHERE id=?",
-                                       ((order_id or "").strip(),)).fetchone()
-                    if row is None:
-                        return {"error": f"找不到订单 {order_id}"}
+                row = conn.execute("SELECT status, is_demo FROM orders WHERE id=?",
+                                   ((order_id or "").strip(),)).fetchone()
+                if row is None:
+                    return {"error": f"找不到订单 {order_id}"}
+                if row["status"] != "待支付":
                     return {"order_id": order_id, "status": row["status"],
-                            "paid": row["status"] != "待支付"}
-            row = conn.execute("SELECT * FROM orders WHERE id=?",
-                               ((order_id or "").strip(),)).fetchone()
-            return {"order_id": order_id, "status": "已完成", "paid": True,
-                    "is_demo": True, "note": "演示订单，已完成但不触发发货"}
+                            "paid": True, "note": "订单已支付过，未重复处理"}
+                next_status = "已完成" if row["is_demo"] else "待发货"
+                conn.execute("UPDATE orders SET status=? WHERE id=? AND status='待支付'",
+                             (next_status, (order_id or "").strip()))
+            return {"order_id": order_id, "status": next_status, "paid": True,
+                    "is_demo": bool(row["is_demo"]),
+                    "note": ("演示订单，已完成但不触发发货" if row["is_demo"]
+                             else "已支付，等待商户发货")}
         except Exception as exc:
             return {"error": f"支付确认失败：{exc}"}
         finally:

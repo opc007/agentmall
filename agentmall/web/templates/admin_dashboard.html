@@ -1,0 +1,36 @@
+{% extends "admin_base.html" %}{% set nav='dash' %}
+{% block title %}看板{% endblock %}
+{% block content %}
+<h2>📊 平台看板</h2>
+<div class="kpis">
+  <div class="kpi"><div class="n">{{ stats.orders }}</div><div class="l">订单总数</div></div>
+  <div class="kpi"><div class="n">¥{{ "%.2f"|format(stats.gmv or 0) }}</div><div class="l">GMV（不含待支付）</div></div>
+  <div class="kpi"><div class="n">{{ stats.users }}</div><div class="l">用户数</div></div>
+  <div class="kpi"><div class="n">{{ stats.merchants }}</div><div class="l">商户数</div></div>
+  <div class="kpi"><div class="n">{{ stats.products }}</div><div class="l">商品数</div></div>
+  <div class="kpi"><div class="n">{{ stats.pending_review }}</div><div class="l">待审核商品</div></div>
+</div>
+<div class="card">
+  <h2>🕒 最近 20 笔订单（实时）</h2>
+  <table><tr><th>订单号</th><th>商品</th><th>金额</th><th>状态</th><th>收货地址（已脱敏）</th><th>下单时间</th></tr>
+  {% for o in orders %}
+  <tr><td>{{ o.order_id }}</td><td>{% for it in o['items'] %}{{ it.name }} ×{{ it.quantity }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td>
+  <td>¥{{ "%.2f"|format(o.total) }}</td><td><span class="badge s-{{ o.status }}">{{ o.status }}</span></td>
+  <td class="muted">{{ o.address_masked }}</td><td class="muted">{{ o.created_at }}</td></tr>
+  {% else %}<tr><td colspan="6" class="muted">暂无订单</td></tr>{% endfor %}
+  </table>
+</div>
+<div class="card">
+  <h2>⏳ 待审核上架申请（{{ pending|length }}）</h2>
+  <table><tr><th>商品</th><th>品类</th><th>定价</th><th>商户</th><th>操作</th></tr>
+  {% for p in pending %}
+  <tr><td>{{ p.name }}</td><td>{{ p.category }}</td><td>¥{{ p.price }}</td><td>{{ p.merchant_id }}</td>
+  <td><form class="inline" method="post" action="/products/{{ p.id }}/review">
+    <input type="hidden" name="approve" value="1"><button type="submit">通过</button></form>
+    <form class="inline" method="post" action="/products/{{ p.id }}/review">
+    <input type="hidden" name="approve" value="0"><input name="reason" placeholder="驳回原因" required>
+    <button class="danger" type="submit">驳回</button></form></td></tr>
+  {% else %}<tr><td colspan="5" class="muted">暂无待审核商品</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}

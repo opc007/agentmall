@@ -1,0 +1,13 @@
+{% extends "admin_base.html" %}{% set nav='audit' %}
+{% block title %}审计日志{% endblock %}
+{% block content %}
+<h2>🧾 审计日志（只读、不可删改）</h2>
+<p class="muted">所有管理员写操作与越权拦截均留痕。数据库层已挂触发器，<code>audit_log</code> 表禁止 UPDATE / DELETE。</p>
+<div class="card">
+<table><tr><th>#</th><th>时间</th><th>角色</th><th>操作者</th><th>动作</th><th>目标</th><th>详情</th></tr>
+{% for l in logs %}
+<tr><td class="muted">{{ l.id }}</td><td class="muted">{{ l.created_at }}</td><td>{{ l.actor_role }}</td>
+<td>{{ l.actor_id }}</td><td>{{ l.action }}</td><td>{{ l.target }}</td><td class="muted">{{ l.detail }}</td></tr>
+{% else %}<tr><td colspan="7" class="muted">暂无审计记录</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

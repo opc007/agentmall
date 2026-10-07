@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>管理员登录 · AgentMall</title>
+<style>
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0f1420;color:#eaf0ff;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+.box{background:#182032;border:1px solid #2a3550;border-radius:14px;padding:36px;width:420px}
+.banner{background:#3a2410;color:#ffd08a;padding:9px;border-radius:8px;font-weight:700;text-align:center;margin-bottom:20px;font-size:14px}
+h1{font-size:21px;margin:0 0 6px}
+p.sub{color:#93a3c0;margin:0 0 22px;font-size:14px}
+input{width:100%;padding:11px 13px;border-radius:8px;border:1px solid #2a3550;background:#0e1524;color:#eaf0ff;font:inherit;margin-bottom:14px;box-sizing:border-box}
+button{width:100%;padding:11px;background:#4f8cff;color:#fff;border:none;border-radius:8px;font:inherit;font-weight:700;cursor:pointer}
+.hint{margin-top:18px;padding:11px;background:#0e1524;border:1px dashed #2a3550;border-radius:8px;font-size:13px;color:#93a3c0}
+code{color:#6ee7a0}
+.err{background:#3d1010;color:#ff9a9a;padding:9px;border-radius:8px;margin-bottom:14px;font-size:14px}
+</style></head><body>
+<div class="box">
+  <div class="banner">⚠️ 演示环境 · 数据均为演示数据</div>
+  <h1>🛡️ 管理后台登录</h1>
+  <p class="sub">输入管理员 API key 进入平台管理视角</p>
+  {% if msg %}<div class="err">{{ msg }}</div>{% endif %}
+  <form method="post" action="/login">
+    <input name="key" placeholder="管理员 API key" required autofocus>
+    <button type="submit">进入管理后台</button>
+  </form>
+  <div class="hint">演示 key：<code>{{ demo_key }}</code><br>
+  管理员与用户/商户的数据完全隔离：管理面独立进程、独立端口（:8002）。</div>
+</div>
+</body></html>

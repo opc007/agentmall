@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}管理后台{% endblock %} · AgentMall 管理后台</title>
+<style>
+:root{--bg:#0f1420;--card:#182032;--line:#2a3550;--fg:#eaf0ff;--muted:#93a3c0;--acc:#4f8cff;--ok:#28c76f;--err:#ff5c5c;--warn:#ffb020}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:16px}
+a{color:var(--acc);text-decoration:none}
+.banner{background:#3a2410;border-bottom:2px solid var(--warn);color:#ffd08a;padding:10px 20px;font-weight:700;text-align:center}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+header h1{font-size:20px;margin:0}
+nav{display:flex;gap:18px;flex:1}
+nav a{color:var(--muted);font-weight:600;padding:6px 2px}
+nav a.on{color:var(--acc);border-bottom:2px solid var(--acc)}
+main{padding:24px;max-width:1400px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px}
+h2{font-size:18px;margin:0 0 14px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;white-space:nowrap}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.kpi{background:#0e1524;border:1px solid var(--line);border-radius:10px;padding:16px}
+.kpi .n{font-size:30px;font-weight:800;color:var(--acc)}
+.kpi .l{color:var(--muted);font-size:13px;margin-top:4px}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:700}
+.s-待支付{background:#3a2a10;color:#ffcf7a}
+.s-已完成{background:#0d3320;color:#6ee7a0}
+.s-待发货{background:#10263d;color:#8fc0ff}
+.s-待收货{background:#241a3d;color:#c4a5ff}
+.s-在售{background:#0d3320;color:#6ee7a0}
+.s-下架{background:#3d1010;color:#ff9a9a}
+.s-待审核{background:#3a2a10;color:#ffcf7a}
+.msg{padding:10px 14px;border-radius:8px;margin-bottom:16px;font-weight:600}
+.msg.ok{background:#0d3320;color:#6ee7a0}
+.msg.err{background:#3d1010;color:#ff9a9a}
+input,select,textarea,button{font:inherit;border-radius:8px;border:1px solid var(--line);padding:8px 12px;background:#0e1524;color:var(--fg)}
+button{background:var(--acc);color:#fff;border:none;cursor:pointer;font-weight:700}
+button:hover{filter:brightness(1.1)}
+button.danger{background:var(--err)}
+.muted{color:var(--muted)}
+form.inline{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="banner">⚠️ 演示环境 · 管理后台 · 商品与订单均为演示数据，支付为模拟支付，不发生任何真实交易</div>
+<header>
+  <h1>🛡️ AgentMall 管理后台</h1>
+  <nav>
+    <a href="/" class="{{ 'on' if nav=='dash' }}">看板</a>
+    <a href="/orders" class="{{ 'on' if nav=='orders' }}">全平台订单</a>
+    <a href="/products" class="{{ 'on' if nav=='products' }}">商品治理</a>
+    <a href="/audit" class="{{ 'on' if nav=='audit' }}">审计日志</a>
+  </nav>
+  <form method="post" action="/logout"><button type="submit">退出</button></form>
+</header>
+<main>
+  {% if msg %}<div class="msg {{ level }}">{{ msg }}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>
