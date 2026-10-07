@@ -2,6 +2,7 @@
   "name": "AgentMall \u8def\u6f14\u73af\u5883",
   "image": "mcr.microsoft.com/devcontainers/python:3.11",
   "postCreateCommand": "pip install -r requirements.txt",
+  "postStartCommand": "bash -c 'setsid nohup python3 -m uvicorn agentmall.web.app:app --host 0.0.0.0 --port 8000 >/tmp/am_web.log 2>&1 < /dev/null & setsid nohup python3 -m agentmall.http_server >/tmp/am_mcp.log 2>&1 < /dev/null & setsid nohup python3 -m uvicorn agentmall.web.admin_app:app --host 0.0.0.0 --port 8002 >/tmp/am_admin.log 2>&1 < /dev/null & sleep 8; curl -sf http://127.0.0.1:8000/healthz && curl -sf http://127.0.0.1:8001/healthz && curl -sf http://127.0.0.1:8002/healthz && echo ALL_UP'",
   "portsAttributes": {
     "8000": { "label": "\u7528\u6237\u9762 Web", "visibility": "public", "onAutoForward": "notify" },
     "8001": { "label": "MCP \u63a5\u5165\u70b9", "visibility": "public", "onAutoForward": "notify" },
