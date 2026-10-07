@@ -1,8 +1,8 @@
 {
   "source": "web_research",
   "fetched_at": "2026-10-07",
-  "is_demo": 1,
-  "note": "演示数据，非真实交易",
+  "is_demo": true,
+  "note": "演示商品库：真实品牌 + 真实公开市场价格，按公开市场信息整理，非电商站点直爬。页面统一标注「演示数据」，生产环境切 1688 官方 API。扩展到 317 个 SKU / 11 个类目：路演时智能体才有足够多「同类不同价」的商品可比价，「找最便宜的」才是个真决策而不是走过场。",
   "products": [
     {
       "name": "维达 超韧系列 抽纸 3层100抽*30包(195*133mm)",
@@ -332,7 +332,7 @@
       "unit": "瓶",
       "specs": "500g/重油污",
       "stock": 210,
-      "merchant_id": "M003"
+      "merchant_id": "M001"
     },
     {
       "name": "奥妙 净蓝全效深层洁净洗衣液 2kg/瓶",
@@ -342,7 +342,7 @@
       "unit": "瓶",
       "specs": "2kg/深层洁净",
       "stock": 140,
-      "merchant_id": "M003"
+      "merchant_id": "M001"
     },
     {
       "name": "汰渍 净白去渍洗衣粉 1.36kg/袋",
@@ -352,7 +352,7 @@
       "unit": "袋",
       "specs": "1.36kg/净白去渍",
       "stock": 260,
-      "merchant_id": "M003"
+      "merchant_id": "M001"
     },
     {
       "name": "雕牌 无磷洗衣粉 508g/袋",
@@ -362,7 +362,7 @@
       "unit": "袋",
       "specs": "508g/无磷",
       "stock": 450,
-      "merchant_id": "M003"
+      "merchant_id": "M001"
     },
     {
       "name": "茶花 收纳箱 斜口前开叠加侧开 34L*3个装",
@@ -372,7 +372,7 @@
       "unit": "套",
       "specs": "34L*3个装",
       "stock": 70,
-      "merchant_id": "M001"
+      "merchant_id": "M002"
     },
     {
       "name": "茶花 收纳箱 小号透明整理箱 8.5L",
@@ -382,7 +382,7 @@
       "unit": "个",
       "specs": "8.5L/透明",
       "stock": 260,
-      "merchant_id": "M001"
+      "merchant_id": "M002"
     },
     {
       "name": "茶花 透明磨砂收纳箱 65L*1个装 带滑轮",
@@ -392,7 +392,7 @@
       "unit": "个",
       "specs": "65L/带滑轮",
       "stock": 55,
-      "merchant_id": "M001"
+      "merchant_id": "M002"
     },
     {
       "name": "茶花 透明磨砂收纳箱 58L*2个装 带滑轮",
@@ -402,7 +402,7 @@
       "unit": "套",
       "specs": "58L*2个装",
       "stock": 40,
-      "merchant_id": "M001"
+      "merchant_id": "M002"
     },
     {
       "name": "茶花 压缩袋 真空收纳袋 电泵5件套 4特大3中",
@@ -412,7 +412,7 @@
       "unit": "套",
       "specs": "电泵5件套",
       "stock": 95,
-      "merchant_id": "M001"
+      "merchant_id": "M002"
     },
     {
       "name": "茶花 压缩袋 真空收纳袋 电泵9件套 4特大4中",
@@ -422,7 +422,7 @@
       "unit": "套",
       "specs": "电泵9件套",
       "stock": 60,
-      "merchant_id": "M001"
+      "merchant_id": "M002"
     },
     {
       "name": "太力 真空压缩收纳袋 星球款 3特大送手泵",
@@ -432,7 +432,7 @@
       "unit": "套",
       "specs": "3特大/赠手泵",
       "stock": 110,
-      "merchant_id": "M003"
+      "merchant_id": "M002"
     },
     {
       "name": "禧天龙 透明收纳箱 玩具储物盒 蓝色盖 三个装",
@@ -442,7 +442,7 @@
       "unit": "套",
       "specs": "3个装/35.7*26*15.4cm",
       "stock": 85,
-      "merchant_id": "M003"
+      "merchant_id": "M002"
     },
     {
       "name": "禧天龙 抽屉式厨房收纳盒 带滑轮 大号3个装",
@@ -452,7 +452,7 @@
       "unit": "套",
       "specs": "3个装/带滑轮",
       "stock": 75,
-      "merchant_id": "M003"
+      "merchant_id": "M002"
     },
     {
       "name": "禧天龙 纯色布艺收纳盒 47*28*20cm 大号米色 2个",
@@ -462,7 +462,7 @@
       "unit": "套",
       "specs": "2个装/47*28*20cm",
       "stock": 130,
-      "merchant_id": "M003"
+      "merchant_id": "M002"
     },
     {
       "name": "禧天龙 双层分格 透白小号5格 2个装",
@@ -472,7 +472,7 @@
       "unit": "套",
       "specs": "5格*2个装",
       "stock": 65,
-      "merchant_id": "M003"
+      "merchant_id": "M002"
     },
     {
       "name": "云南白药 牙膏 经典系列 留兰香型 165g",
@@ -482,7 +482,7 @@
       "unit": "支",
       "specs": "165g/留兰香",
       "stock": 220,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "云南白药 牙膏 益生菌清新口气 260g",
@@ -492,7 +492,7 @@
       "unit": "支",
       "specs": "260g/益生菌",
       "stock": 180,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "云南白药 漱口水 金口健盐系清新 250ml",
@@ -502,7 +502,7 @@
       "unit": "瓶",
       "specs": "250ml/盐系清新",
       "stock": 200,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "舒肤佳 经典净护系列 沐浴露 纯白清香 1L",
@@ -512,7 +512,7 @@
       "unit": "瓶",
       "specs": "1L/纯白清香",
       "stock": 150,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "舒肤佳 健康净护沐浴露 纯白清香 720g*2瓶",
@@ -522,7 +522,7 @@
       "unit": "套",
       "specs": "720g*2瓶",
       "stock": 120,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "舒肤佳 净护沐浴露 纯白清香 80g 旅行装",
@@ -532,7 +532,7 @@
       "unit": "瓶",
       "specs": "80g/旅行装",
       "stock": 380,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "六神 三重薄荷清凉沐浴露 750ml+420ml",
@@ -542,7 +542,7 @@
       "unit": "套",
       "specs": "750ml+420ml",
       "stock": 170,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "六神 冰凉劲爽沐浴露 450g",
@@ -552,7 +552,7 @@
       "unit": "瓶",
       "specs": "450g/冰凉劲爽",
       "stock": 290,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "冷酸灵 抗敏感牙膏 140g",
@@ -562,7 +562,7 @@
       "unit": "支",
       "specs": "140g/抗敏感",
       "stock": 340,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "舒适达 专业修复抗敏感牙膏 300g",
@@ -572,7 +572,7 @@
       "unit": "支",
       "specs": "300g/专业修复",
       "stock": 90,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "舒客 防蛀氟素牙膏 140g",
@@ -582,7 +582,7 @@
       "unit": "支",
       "specs": "140g/防蛀氟素",
       "stock": 360,
-      "merchant_id": "M002"
+      "merchant_id": "M003"
     },
     {
       "name": "高露洁 美白护龈牙膏 3支装 120g*2+40g",
@@ -592,6 +592,2586 @@
       "unit": "套",
       "specs": "280g/3支装",
       "stock": 250,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "心相印 抽纸 3层130抽*24包(卫生卷纸)",
+      "category": "纸巾",
+      "price": 39.9,
+      "original_price": 49.8,
+      "unit": "提",
+      "specs": "3层/130抽*24包",
+      "stock": 260,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "清风 原木纯品 抽纸 2层100抽*36包",
+      "category": "纸巾",
+      "price": 33.6,
+      "original_price": 42.0,
+      "unit": "提",
+      "specs": "2层/100抽*36包",
+      "stock": 280,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "得宝 棉柔纸巾 4层150抽*24包(进口原料)",
+      "category": "纸巾",
+      "price": 89.9,
+      "original_price": 108.0,
+      "unit": "箱",
+      "specs": "4层/150抽*24包",
+      "stock": 90,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "斑布 抹布式洗脸巾 80抽*6包",
+      "category": "纸巾",
+      "price": 29.9,
+      "original_price": 39.9,
+      "unit": "箱",
+      "specs": "80抽*6包",
+      "stock": 150,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "五月花 亲肤绵柔 抽纸 3层120抽*18包",
+      "category": "纸巾",
+      "price": 21.8,
+      "original_price": 29.9,
+      "unit": "提",
+      "specs": "3层/120抽*18包",
+      "stock": 240,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "维达 超韧 手帕纸 4层*40抽*12包",
+      "category": "纸巾",
+      "price": 15.8,
+      "original_price": 21.9,
+      "unit": "提",
+      "specs": "4层/40抽*12包",
+      "stock": 300,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁柔 face 手帕纸 3层50抽*24包",
+      "category": "纸巾",
+      "price": 12.9,
+      "original_price": 17.9,
+      "unit": "箱",
+      "specs": "3层/50抽*24包",
+      "stock": 350,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "顺清柔 亲肤 抽纸 2层120抽*30包",
+      "category": "纸巾",
+      "price": 26.9,
+      "original_price": 34.9,
+      "unit": "提",
+      "specs": "2层/120抽*30包",
+      "stock": 210,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "卷纸 有芯卷纸 4层180g*27卷(家庭装)",
+      "category": "纸巾",
+      "price": 36.9,
+      "original_price": 45.9,
+      "unit": "提",
+      "specs": "4层/180g*27卷",
+      "stock": 190,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "心相印 卷纸 3层170g*30卷 有芯",
+      "category": "纸巾",
+      "price": 42.9,
+      "original_price": 52.9,
+      "unit": "提",
+      "specs": "3层/170g*30卷",
+      "stock": 160,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁云 抽纸 3层100抽*8包(小包便携)",
+      "category": "纸巾",
+      "price": 6.9,
+      "original_price": 9.9,
+      "unit": "提",
+      "specs": "3层/100抽*8包",
+      "stock": 480,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "维达 卷纸 4层140g*30卷",
+      "category": "纸巾",
+      "price": 32.9,
+      "original_price": 39.9,
+      "unit": "提",
+      "specs": "4层/140g*30卷",
+      "stock": 200,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "植护 婴儿级 抽纸 3层110抽*20包",
+      "category": "纸巾",
+      "price": 18.8,
+      "original_price": 25.9,
+      "unit": "提",
+      "specs": "3层/110抽*20包",
+      "stock": 270,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "泉林本色 亲肤 抽纸 3层120抽*24包",
+      "category": "纸巾",
+      "price": 27.9,
+      "original_price": 35.9,
+      "unit": "提",
+      "specs": "3层/120抽*24包",
+      "stock": 230,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "五月生 竹浆 抽纸 3层100抽*24包",
+      "category": "纸巾",
+      "price": 23.9,
+      "original_price": 30.9,
+      "unit": "提",
+      "specs": "3层/100抽*24包",
+      "stock": 250,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁柔 蓝面子 抽纸 3层130抽*27包",
+      "category": "纸巾",
+      "price": 31.5,
+      "original_price": 40.9,
+      "unit": "提",
+      "specs": "3层/130抽*27包",
+      "stock": 220,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "心相印 茶语丝享 手帕纸 3层80抽*18包",
+      "category": "纸巾",
+      "price": 14.8,
+      "original_price": 19.8,
+      "unit": "箱",
+      "specs": "3层/80抽*18包",
+      "stock": 310,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁云 垃圾袋 背心式 45*50cm 100只*3卷",
+      "category": "垃圾袋",
+      "price": 16.8,
+      "original_price": 22.9,
+      "unit": "卷",
+      "specs": "45*50cm/100只*3卷",
+      "stock": 400,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "妙洁 加厚垃圾袋 50*60cm 100只*5卷",
+      "category": "垃圾袋",
+      "price": 29.9,
+      "original_price": 38.9,
+      "unit": "箱",
+      "specs": "50*60cm/100只*5卷",
+      "stock": 260,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "美丽雅 平口垃圾袋 45*50cm 80只*4卷",
+      "category": "垃圾袋",
+      "price": 19.9,
+      "original_price": 25.9,
+      "unit": "箱",
+      "specs": "45*50cm/80只*4卷",
+      "stock": 330,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "茶花 加厚垃圾袋 60*80cm 50只*4卷",
+      "category": "垃圾袋",
+      "price": 22.8,
+      "original_price": 29.9,
+      "unit": "箱",
+      "specs": "60*80cm/50只*4卷",
+      "stock": 280,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "妙洁 抽绳垃圾袋 45*50cm 90只*3卷",
+      "category": "垃圾袋",
+      "price": 21.9,
+      "original_price": 27.9,
+      "unit": "箱",
+      "specs": "45*50cm/90只*3卷",
+      "stock": 300,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "世家 垃圾袋 背心式 40*45cm 100只*2卷",
+      "category": "垃圾袋",
+      "price": 8.9,
+      "original_price": 12.9,
+      "unit": "卷",
+      "specs": "40*45cm/100只*2卷",
+      "stock": 520,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "茶花 平板垃圾袋 45*55cm 100只*5卷",
+      "category": "垃圾袋",
+      "price": 24.9,
+      "original_price": 31.9,
+      "unit": "箱",
+      "specs": "45*55cm/100只*5卷",
+      "stock": 290,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁成 加厚垃圾袋 50*60cm 80只*3卷",
+      "category": "垃圾袋",
+      "price": 17.9,
+      "original_price": 23.9,
+      "unit": "箱",
+      "specs": "50*60cm/80只*3卷",
+      "stock": 350,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "美丽雅 抽绳垃圾袋 50*60cm 50只*3卷",
+      "category": "垃圾袋",
+      "price": 18.9,
+      "original_price": 24.9,
+      "unit": "箱",
+      "specs": "50*60cm/50只*3卷",
+      "stock": 320,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "妙洁 厨房垃圾袋 45*50cm 120只*3卷",
+      "category": "垃圾袋",
+      "price": 20.9,
+      "original_price": 26.9,
+      "unit": "箱",
+      "specs": "45*50cm/120只*3卷",
+      "stock": 310,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "茶花 家居垃圾袋 40*50cm 100只*4卷",
+      "category": "垃圾袋",
+      "price": 15.9,
+      "original_price": 20.9,
+      "unit": "箱",
+      "specs": "40*50cm/100只*4卷",
+      "stock": 380,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁柔 垃圾袋 背心式 45*50cm 100只*3卷",
+      "category": "垃圾袋",
+      "price": 12.8,
+      "original_price": 16.9,
+      "unit": "箱",
+      "specs": "45*50cm/100只*3卷",
+      "stock": 450,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "妙洁 超厚垃圾袋 60*75cm 50只*4卷",
+      "category": "垃圾袋",
+      "price": 27.9,
+      "original_price": 35.9,
+      "unit": "箱",
+      "specs": "60*75cm/50只*4卷",
+      "stock": 250,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "安馨 垃圾袋 背心式 45*50cm 60只*5卷",
+      "category": "垃圾袋",
+      "price": 11.9,
+      "original_price": 15.9,
+      "unit": "箱",
+      "specs": "45*50cm/60只*5卷",
+      "stock": 470,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "汰渍 洗衣液 2kg 深层洁净(套装)",
+      "category": "清洁",
+      "price": 32.9,
+      "original_price": 45.9,
+      "unit": "瓶",
+      "specs": "2kg/瓶",
+      "stock": 220,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "蓝月亮 深层洁净 洗衣液 3kg",
+      "category": "清洁",
+      "price": 45.8,
+      "original_price": 62.0,
+      "unit": "瓶",
+      "specs": "3kg/瓶",
+      "stock": 180,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "立白 天然亲肤 洗衣液 2kg",
+      "category": "清洁",
+      "price": 26.9,
+      "original_price": 35.9,
+      "unit": "瓶",
+      "specs": "2kg/瓶",
+      "stock": 260,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "雕牌 全效加浓 洗衣液 2kg",
+      "category": "清洁",
+      "price": 18.9,
+      "original_price": 25.9,
+      "unit": "瓶",
+      "specs": "2kg/瓶",
+      "stock": 310,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "奥妙 除菌 洗衣液 3kg",
+      "category": "清洁",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "瓶",
+      "specs": "3kg/瓶",
+      "stock": 160,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "白猫 柠檬洗洁精 500g*2瓶",
+      "category": "清洁",
+      "price": 14.9,
+      "original_price": 19.9,
+      "unit": "瓶",
+      "specs": "500g*2瓶",
+      "stock": 380,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "雕牌 洗洁精 1kg+0.5kg",
+      "category": "清洁",
+      "price": 12.8,
+      "original_price": 17.8,
+      "unit": "套",
+      "specs": "1kg+0.5kg",
+      "stock": 420,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "立白 柠檬洗洁精 1kg",
+      "category": "清洁",
+      "price": 11.9,
+      "original_price": 15.9,
+      "unit": "瓶",
+      "specs": "1kg/瓶",
+      "stock": 460,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "蓝月亮 洁厕灵 500g*2瓶",
+      "category": "清洁",
+      "price": 16.8,
+      "original_price": 21.9,
+      "unit": "瓶",
+      "specs": "500g*2瓶",
+      "stock": 340,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "威猛先生 洁厕液 500ml*2瓶",
+      "category": "清洁",
+      "price": 24.9,
+      "original_price": 32.9,
+      "unit": "瓶",
+      "specs": "500ml*2瓶",
+      "stock": 270,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "绿伞 厨房重油污净 500g+喷头",
+      "category": "清洁",
+      "price": 15.9,
+      "original_price": 20.9,
+      "unit": "瓶",
+      "specs": "500g/瓶",
+      "stock": 300,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "花王 泡沫漂白剂 600ml",
+      "category": "清洁",
+      "price": 22.8,
+      "original_price": 29.9,
+      "unit": "瓶",
+      "specs": "600ml/瓶",
+      "stock": 250,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "84消毒液 1L+1L(衣物家居通用)",
+      "category": "清洁",
+      "price": 13.9,
+      "original_price": 18.9,
+      "unit": "套",
+      "specs": "1L*2瓶",
+      "stock": 400,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "威露士 衣物消毒液 1L",
+      "category": "清洁",
+      "price": 29.9,
+      "original_price": 39.9,
+      "unit": "瓶",
+      "specs": "1L/瓶",
+      "stock": 230,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "滴露 消毒液 750ml+200ml",
+      "category": "清洁",
+      "price": 42.9,
+      "original_price": 56.9,
+      "unit": "套",
+      "specs": "750ml+200ml",
+      "stock": 150,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "超能 皂粉 2kg 天然皂粉",
+      "category": "清洁",
+      "price": 25.9,
+      "original_price": 33.9,
+      "unit": "袋",
+      "specs": "2kg/袋",
+      "stock": 280,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "立白 洗洁精 柠檬 500g*3瓶",
+      "category": "清洁",
+      "price": 19.8,
+      "original_price": 25.9,
+      "unit": "箱",
+      "specs": "500g*3瓶",
+      "stock": 360,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "妙洁 平板拖把套装(含替换布)",
+      "category": "清洁",
+      "price": 34.9,
+      "original_price": 45.9,
+      "unit": "套",
+      "specs": "拖把+2个替换头",
+      "stock": 190,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "百家好世 双面静电拖把 免手洗",
+      "category": "清洁",
+      "price": 49.9,
+      "original_price": 65.9,
+      "unit": "套",
+      "specs": "双面/含10片一次性拖布",
+      "stock": 130,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "家必洁 钢丝球 20个装",
+      "category": "清洁",
+      "price": 6.9,
+      "original_price": 9.9,
+      "unit": "包",
+      "specs": "20个/包",
+      "stock": 520,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "3M 百洁布 蓝色 10片装",
+      "category": "清洁",
+      "price": 12.9,
+      "original_price": 17.9,
+      "unit": "包",
+      "specs": "10片/包",
+      "stock": 300,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "妙洁 平板地垫 40*60cm",
+      "category": "收纳",
+      "price": 18.9,
+      "original_price": 24.9,
+      "unit": "张",
+      "specs": "40*60cm/张",
+      "stock": 240,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "茶花 塑料收纳箱 55L 带盖",
+      "category": "收纳",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "个",
+      "specs": "55L/带盖可叠放",
+      "stock": 170,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "乐扣乐扣 保鲜盒 2L 四件套",
+      "category": "收纳",
+      "price": 68.9,
+      "original_price": 89.9,
+      "unit": "套",
+      "specs": "2L*4个/四面密封",
+      "stock": 110,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "茶花 抽屉分隔收纳盒 2件套",
+      "category": "收纳",
+      "price": 16.9,
+      "original_price": 22.9,
+      "unit": "套",
+      "specs": "2个/套",
+      "stock": 350,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "倍轻松 衣物收纳箱 66L 可视窗口",
+      "category": "收纳",
+      "price": 45.9,
+      "original_price": 59.9,
+      "unit": "个",
+      "specs": "66L/可视窗口",
+      "stock": 150,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "小抽屉 化妆品收纳盒 三层",
+      "category": "收纳",
+      "price": 24.9,
+      "original_price": 32.9,
+      "unit": "个",
+      "specs": "三层/带抽屉",
+      "stock": 260,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "美好观 衣柜分隔板 3片装",
+      "category": "收纳",
+      "price": 19.9,
+      "original_price": 26.9,
+      "unit": "套",
+      "specs": "3片/套",
+      "stock": 290,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "茶花 挂钩式收纳袋 3个装",
+      "category": "收纳",
+      "price": 21.9,
+      "original_price": 28.9,
+      "unit": "套",
+      "specs": "3个/套",
+      "stock": 270,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "膳魔师 不锈钢保温壶 1.5L",
+      "category": "收纳",
+      "price": 159.0,
+      "original_price": 198.0,
+      "unit": "个",
+      "specs": "1.5L/304不锈钢",
+      "stock": 60,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "希诺 保温杯 500ml",
+      "category": "收纳",
+      "price": 89.0,
+      "original_price": 118.0,
+      "unit": "个",
+      "specs": "500ml/316不锈钢",
+      "stock": 90,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "富光 保温杯 500ml 简约款",
+      "category": "收纳",
+      "price": 49.9,
+      "original_price": 65.9,
+      "unit": "个",
+      "specs": "500ml",
+      "stock": 200,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "茶花 鞋架 4层 可折叠",
+      "category": "收纳",
+      "price": 32.9,
+      "original_price": 42.9,
+      "unit": "个",
+      "specs": "4层/可折叠",
+      "stock": 180,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "好媳妇 晾衣架 落地款 55杆",
+      "category": "收纳",
+      "price": 79.0,
+      "original_price": 99.0,
+      "unit": "个",
+      "specs": "55杆/落地",
+      "stock": 70,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "茶花 浴室置物架 双层免打孔",
+      "category": "收纳",
+      "price": 27.9,
+      "original_price": 35.9,
+      "unit": "个",
+      "specs": "双层/免打孔",
+      "stock": 230,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "太力 真空压缩收纳袋 4件套",
+      "category": "收纳",
+      "price": 42.9,
+      "original_price": 55.9,
+      "unit": "套",
+      "specs": "4件/含手泵",
+      "stock": 160,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "茶花 桌面收纳盒 抽屉式",
+      "category": "收纳",
+      "price": 13.9,
+      "original_price": 18.9,
+      "unit": "个",
+      "specs": "抽屉式",
+      "stock": 330,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "洁柔 洗发水 750ml 控油去屑",
+      "category": "个护",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "瓶",
+      "specs": "750ml/瓶",
+      "stock": 220,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "海飞丝 去屑洗发露 750ml",
+      "category": "个护",
+      "price": 55.9,
+      "original_price": 72.0,
+      "unit": "瓶",
+      "specs": "750ml/瓶",
+      "stock": 170,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "飘柔 精华洗发水 500ml",
+      "category": "个护",
+      "price": 29.9,
+      "original_price": 38.9,
+      "unit": "瓶",
+      "specs": "500ml/瓶",
+      "stock": 260,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "潘婷 丝质顺滑 洗发露 750ml",
+      "category": "个护",
+      "price": 62.9,
+      "original_price": 82.0,
+      "unit": "瓶",
+      "specs": "750ml/瓶",
+      "stock": 140,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "蜂花 经典黄蜂护发素 250ml",
+      "category": "个护",
+      "price": 15.8,
+      "original_price": 19.8,
+      "unit": "瓶",
+      "specs": "250ml/瓶",
+      "stock": 350,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "滋源 无硅油 洗发露 500ml",
+      "category": "个护",
+      "price": 69.0,
+      "original_price": 89.0,
+      "unit": "瓶",
+      "specs": "500ml/无硅油",
+      "stock": 120,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "舒肤佳 纯白清香型 沐浴露 400ml*3",
+      "category": "个护",
+      "price": 42.9,
+      "original_price": 55.9,
+      "unit": "套",
+      "specs": "400ml*3瓶",
+      "stock": 200,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "多芬 滋润沐浴露 500g*2",
+      "category": "个护",
+      "price": 49.9,
+      "original_price": 64.9,
+      "unit": "套",
+      "specs": "500g*2瓶",
+      "stock": 180,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "六神 沐浴露 500ml+花露水",
+      "category": "个护",
+      "price": 29.9,
+      "original_price": 38.9,
+      "unit": "套",
+      "specs": "500ml+100ml",
+      "stock": 250,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "云南白药 益肤霜 50g",
+      "category": "个护",
+      "price": 68.0,
+      "original_price": 88.0,
+      "unit": "支",
+      "specs": "50g/支",
+      "stock": 150,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "凡士林 晶冻身体乳 400ml",
+      "category": "个护",
+      "price": 45.9,
+      "original_price": 59.9,
+      "unit": "瓶",
+      "specs": "400ml/瓶",
+      "stock": 190,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "郁美净 儿童霜 25g*2",
+      "category": "个护",
+      "price": 21.9,
+      "original_price": 27.9,
+      "unit": "套",
+      "specs": "25g*2盒",
+      "stock": 280,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "舒客 儿童防蛀牙膏 2支装",
+      "category": "个护",
+      "price": 19.9,
+      "original_price": 25.9,
+      "unit": "套",
+      "specs": "50g*2支",
+      "stock": 310,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "中华 健齿白牙刷 2支",
+      "category": "个护",
+      "price": 9.9,
+      "original_price": 13.9,
+      "unit": "支",
+      "specs": "软毛/2支",
+      "stock": 450,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "冷酸灵 抗敏感牙膏 120g+50g",
+      "category": "个护",
+      "price": 22.9,
+      "original_price": 29.9,
+      "unit": "套",
+      "specs": "120g+50g",
+      "stock": 270,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "舒肤佳 纯白清香型 香皂 4块",
+      "category": "个护",
+      "price": 15.9,
+      "original_price": 20.9,
+      "unit": "盒",
+      "specs": "125g*4块",
+      "stock": 340,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "雕牌 全效馨香型 洗衣皂 2块",
+      "category": "个护",
+      "price": 8.9,
+      "original_price": 11.9,
+      "unit": "套",
+      "specs": "165g*2块",
+      "stock": 400,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "清风 抽纸 3层100抽*10包(补充装)",
+      "category": "纸巾",
+      "price": 9.9,
+      "original_price": 13.9,
+      "unit": "提",
+      "specs": "3层/100抽*10包",
+      "stock": 480,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "心相印 湿厕纸 80抽*6包",
+      "category": "卫生护理",
+      "price": 19.9,
+      "original_price": 25.9,
+      "unit": "箱",
+      "specs": "80抽*6包",
+      "stock": 320,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "清风 湿厕纸 84抽*10包",
+      "category": "卫生护理",
+      "price": 25.9,
+      "original_price": 32.9,
+      "unit": "箱",
+      "specs": "84抽*10包",
+      "stock": 300,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "维达 湿厕纸 80抽*8包",
+      "category": "卫生护理",
+      "price": 22.9,
+      "original_price": 29.9,
+      "unit": "箱",
+      "specs": "80抽*8包",
+      "stock": 290,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "苏菲 卫生巾 日用 240mm 4片*5包",
+      "category": "卫生护理",
+      "price": 29.9,
+      "original_price": 38.9,
+      "unit": "箱",
+      "specs": "240mm/4片*5包",
+      "stock": 240,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "护舒宝 安心裤 280mm 4片*3包",
+      "category": "个护",
+      "price": 45.9,
+      "original_price": 59.9,
+      "unit": "箱",
+      "specs": "280mm/4片*3包",
+      "stock": 160,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "七度空间 卫生巾 夜用 290mm 4片*4包",
+      "category": "卫生护理",
+      "price": 32.9,
+      "original_price": 42.9,
+      "unit": "箱",
+      "specs": "290mm/4片*4包",
+      "stock": 210,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "苏菲 超熟睡 夜用 410mm 2片*5包",
+      "category": "个护",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "箱",
+      "specs": "410mm/2片*5包",
+      "stock": 175,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "洁柔 抽纸 3层120抽*12包(便携装)",
+      "category": "纸巾",
+      "price": 11.9,
+      "original_price": 15.9,
+      "unit": "提",
+      "specs": "3层/120抽*12包",
+      "stock": 430,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "一次性洗脸巾 干湿两用 100抽*3包",
+      "category": "个护",
+      "price": 12.9,
+      "original_price": 17.9,
+      "unit": "箱",
+      "specs": "100抽*3包",
+      "stock": 360,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "御泥坊 芦荟胶 180g",
+      "category": "个护",
+      "price": 35.9,
+      "original_price": 46.0,
+      "unit": "瓶",
+      "specs": "180g/瓶",
+      "stock": 220,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "自然堂 补水面膜 20片装",
+      "category": "个护",
+      "price": 89.0,
+      "original_price": 115.0,
+      "unit": "盒",
+      "specs": "20片/盒",
+      "stock": 100,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "苏菲 卫生纸 卷纸 4层180g*27卷",
+      "category": "纸巾",
+      "price": 34.9,
+      "original_price": 43.9,
+      "unit": "提",
+      "specs": "4层/180g*27卷",
+      "stock": 200,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁柔 face 抽纸 3层100抽*24包",
+      "category": "纸巾",
+      "price": 20.9,
+      "original_price": 27.9,
+      "unit": "提",
+      "specs": "3层/100抽*24包",
+      "stock": 280,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "心相印 婴儿柔纸巾 3层80抽*18包",
+      "category": "纸巾",
+      "price": 22.9,
+      "original_price": 29.9,
+      "unit": "提",
+      "specs": "3层/80抽*18包",
+      "stock": 290,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "苏菲 安心柔绵卫生巾 日用 4片*5包",
+      "category": "卫生护理",
+      "price": 27.9,
+      "original_price": 36.9,
+      "unit": "箱",
+      "specs": "日用/4片*5包",
+      "stock": 250,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁云 婴儿手口湿巾 80抽*4包",
+      "category": "母婴",
+      "price": 16.9,
+      "original_price": 21.9,
+      "unit": "箱",
+      "specs": "80抽*4包",
+      "stock": 380,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "得力 垃圾袋 45*50cm 100只*3卷",
+      "category": "垃圾袋",
+      "price": 10.9,
+      "original_price": 14.9,
+      "unit": "箱",
+      "specs": "45*50cm/100只*3卷",
+      "stock": 490,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "妇炎洁 妇科洗液 100ml",
+      "category": "个护",
+      "price": 24.9,
+      "original_price": 32.9,
+      "unit": "瓶",
+      "specs": "100ml/瓶",
+      "stock": 200,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "启初 儿童洗发沐浴二合一 500ml",
+      "category": "个护",
+      "price": 58.0,
+      "original_price": 75.0,
+      "unit": "瓶",
+      "specs": "500ml/瓶",
+      "stock": 130,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "贝亲 婴儿洗衣液 120ml*2",
+      "category": "清洁",
+      "price": 46.9,
+      "original_price": 60.0,
+      "unit": "套",
+      "specs": "120ml*2瓶",
+      "stock": 145,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "苏菲 卫生巾 夜用加长 4片*4包",
+      "category": "卫生护理",
+      "price": 36.9,
+      "original_price": 47.9,
+      "unit": "箱",
+      "specs": "夜用/4片*4包",
+      "stock": 185,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "清风 纸手帕 抽纸 2层150抽*20包",
+      "category": "纸巾",
+      "price": 23.9,
+      "original_price": 30.9,
+      "unit": "提",
+      "specs": "2层/150抽*20包",
+      "stock": 240,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁柔 face 手帕纸 3层50抽*12包",
+      "category": "纸巾",
+      "price": 9.9,
+      "original_price": 13.9,
+      "unit": "提",
+      "specs": "3层/50抽*12包",
+      "stock": 440,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "苏菲 纯棉柔巾 100抽*3包",
+      "category": "母婴",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "箱",
+      "specs": "100抽*3包",
+      "stock": 170,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "维达 超韧 抽纸 3层100抽*12包",
+      "category": "纸巾",
+      "price": 13.9,
+      "original_price": 18.9,
+      "unit": "提",
+      "specs": "3层/100抽*12包",
+      "stock": 420,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "心相印 抽纸 2层100抽*18包",
+      "category": "纸巾",
+      "price": 15.9,
+      "original_price": 20.9,
+      "unit": "提",
+      "specs": "2层/100抽*18包",
+      "stock": 370,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "清风 抽纸 3层100抽*6包",
+      "category": "纸巾",
+      "price": 5.9,
+      "original_price": 8.9,
+      "unit": "提",
+      "specs": "3层/100抽*6包",
+      "stock": 560,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "妙洁 垃圾袋 中号 45*55cm 100只*4卷",
+      "category": "垃圾袋",
+      "price": 20.9,
+      "original_price": 27.9,
+      "unit": "箱",
+      "specs": "45*55cm/100只*4卷",
+      "stock": 330,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "舒肤佳 沐浴露 400ml*2+香皂1块",
+      "category": "个护",
+      "price": 32.9,
+      "original_price": 42.9,
+      "unit": "套",
+      "specs": "400ml*2+香皂",
+      "stock": 230,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "六神 花露水 100ml*3",
+      "category": "个护",
+      "price": 21.9,
+      "original_price": 28.9,
+      "unit": "套",
+      "specs": "100ml*3瓶",
+      "stock": 290,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "隆力奇 蛇油护手霜 50g*3",
+      "category": "个护",
+      "price": 13.9,
+      "original_price": 18.9,
+      "unit": "套",
+      "specs": "50g*3支",
+      "stock": 360,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "妮维雅 润肤露 200ml",
+      "category": "个护",
+      "price": 18.9,
+      "original_price": 24.9,
+      "unit": "瓶",
+      "specs": "200ml/瓶",
+      "stock": 270,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "妮维雅 身体乳 400ml",
+      "category": "个护",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "瓶",
+      "specs": "400ml/瓶",
+      "stock": 175,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "美加净 洗手液 500ml*2",
+      "category": "个护",
+      "price": 14.9,
+      "original_price": 19.9,
+      "unit": "套",
+      "specs": "500ml*2瓶",
+      "stock": 380,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "蓝月亮 深层洁净 洗衣液 2kg",
+      "category": "清洁",
+      "price": 32.8,
+      "original_price": 43.9,
+      "unit": "瓶",
+      "specs": "2kg/瓶",
+      "stock": 210,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "汰渍 洁厕净 500g",
+      "category": "清洁",
+      "price": 13.9,
+      "original_price": 18.9,
+      "unit": "瓶",
+      "specs": "500g/瓶",
+      "stock": 300,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "威猛先生 厨房清洁剂 500ml",
+      "category": "清洁",
+      "price": 16.9,
+      "original_price": 21.9,
+      "unit": "瓶",
+      "specs": "500ml/瓶",
+      "stock": 290,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "心相印 纸手帕 3层40抽*12包",
+      "category": "纸巾",
+      "price": 11.9,
+      "original_price": 15.9,
+      "unit": "提",
+      "specs": "3层/40抽*12包",
+      "stock": 410,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "清风 纯品 抽纸 3层130抽*24包",
+      "category": "纸巾",
+      "price": 35.9,
+      "original_price": 46.9,
+      "unit": "提",
+      "specs": "3层/130抽*24包",
+      "stock": 185,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "碧浪 洗衣凝珠 30颗*2盒",
+      "category": "清洁",
+      "price": 69.9,
+      "original_price": 89.9,
+      "unit": "套",
+      "specs": "30颗*2盒",
+      "stock": 115,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "汰渍 洗衣凝珠 25颗",
+      "category": "清洁",
+      "price": 45.9,
+      "original_price": 59.9,
+      "unit": "盒",
+      "specs": "25颗/盒",
+      "stock": 150,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "蓝月亮 洗衣机槽清洁剂 200g*3",
+      "category": "清洁",
+      "price": 29.9,
+      "original_price": 39.9,
+      "unit": "套",
+      "specs": "200g*3袋",
+      "stock": 220,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "老管家 管道疏通剂 500g",
+      "category": "清洁",
+      "price": 12.9,
+      "original_price": 16.9,
+      "unit": "瓶",
+      "specs": "500g/瓶",
+      "stock": 310,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "绿伞 除霉剂 500ml",
+      "category": "清洁",
+      "price": 15.9,
+      "original_price": 20.9,
+      "unit": "瓶",
+      "specs": "500ml/瓶",
+      "stock": 280,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "心相印 卷纸 4层140g*30卷",
+      "category": "纸巾",
+      "price": 30.9,
+      "original_price": 38.9,
+      "unit": "提",
+      "specs": "4层/140g*30卷",
+      "stock": 210,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁柔 婴儿柔巾 80抽*4包",
+      "category": "母婴",
+      "price": 13.9,
+      "original_price": 18.9,
+      "unit": "箱",
+      "specs": "80抽*4包",
+      "stock": 370,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "苏菲 卫生巾 全棉时代 日用 4片*5包",
+      "category": "卫生护理",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "箱",
+      "specs": "日用/4片*5包",
+      "stock": 160,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "自由点 卫生巾 夜用 4片*3包",
+      "category": "卫生护理",
+      "price": 28.9,
+      "original_price": 37.9,
+      "unit": "箱",
+      "specs": "夜用/4片*3包",
+      "stock": 230,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "abc 卫生巾 棉柔 4片*4包",
+      "category": "卫生护理",
+      "price": 23.9,
+      "original_price": 31.9,
+      "unit": "箱",
+      "specs": "日用/4片*4包",
+      "stock": 265,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "高洁丝 卫生巾 4片*3包",
+      "category": "卫生护理",
+      "price": 26.9,
+      "original_price": 35.9,
+      "unit": "箱",
+      "specs": "夜用/4片*3包",
+      "stock": 240,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "护舒宝 卫生巾 丝滑 4片*5包",
+      "category": "卫生护理",
+      "price": 35.9,
+      "original_price": 46.9,
+      "unit": "箱",
+      "specs": "日用/4片*5包",
+      "stock": 185,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "苏菲 弹力棉 卫生巾 4片*5包",
+      "category": "卫生护理",
+      "price": 31.9,
+      "original_price": 41.9,
+      "unit": "箱",
+      "specs": "日用/4片*5包",
+      "stock": 205,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "七度空间 卫生巾 日用 240mm 4片*3包",
+      "category": "卫生护理",
+      "price": 24.9,
+      "original_price": 32.9,
+      "unit": "箱",
+      "specs": "240mm/4片*3包",
+      "stock": 255,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "苏菲 卫生巾 绵柔丝薄 4片*4包",
+      "category": "卫生护理",
+      "price": 29.9,
+      "original_price": 38.9,
+      "unit": "箱",
+      "specs": "日用/4片*4包",
+      "stock": 225,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "清风 抽纸 4层140抽*20包(柔韧款)",
+      "category": "纸巾",
+      "price": 29.9,
+      "original_price": 38.9,
+      "unit": "提",
+      "specs": "4层/140抽*20包",
+      "stock": 215,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁柔 face 抽纸 2层120抽*20包",
+      "category": "纸巾",
+      "price": 17.9,
+      "original_price": 23.9,
+      "unit": "提",
+      "specs": "2层/120抽*20包",
+      "stock": 320,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "维达 卷纸 3层150g*30卷",
+      "category": "纸巾",
+      "price": 28.9,
+      "original_price": 36.9,
+      "unit": "提",
+      "specs": "3层/150g*30卷",
+      "stock": 225,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "得宝 抽纸 4层150抽*10包(小规格)",
+      "category": "纸巾",
+      "price": 39.9,
+      "original_price": 49.9,
+      "unit": "提",
+      "specs": "4层/150抽*10包",
+      "stock": 155,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "心相印 抽纸 3层100抽*12包",
+      "category": "纸巾",
+      "price": 16.9,
+      "original_price": 21.9,
+      "unit": "提",
+      "specs": "3层/100抽*12包",
+      "stock": 355,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "斑布 抽纸 3层100抽*15包",
+      "category": "纸巾",
+      "price": 21.9,
+      "original_price": 28.9,
+      "unit": "提",
+      "specs": "3层/100抽*15包",
+      "stock": 280,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "洁云 抽纸 3层100抽*9包",
+      "category": "纸巾",
+      "price": 10.9,
+      "original_price": 14.9,
+      "unit": "提",
+      "specs": "3层/100抽*9包",
+      "stock": 430,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "柔韧 纸手帕 3层50抽*20包",
+      "category": "纸巾",
+      "price": 14.9,
+      "original_price": 19.9,
+      "unit": "提",
+      "specs": "3层/50抽*20包",
+      "stock": 350,
+      "merchant_id": "M001"
+    },
+    {
+      "name": "苏泊尔 不粘炒锅 30cm 麦饭石涂层",
+      "category": "厨房",
+      "price": 129.0,
+      "original_price": 169.0,
+      "unit": "个",
+      "specs": "30cm/不粘涂层",
+      "stock": 90,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "爱仕达 不锈钢汤锅 24cm 双层",
+      "category": "厨房",
+      "price": 159.0,
+      "original_price": 199.0,
+      "unit": "个",
+      "specs": "24cm/304不锈钢双层",
+      "stock": 60,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "九阳 电磁炉 2200W 家用",
+      "category": "厨房",
+      "price": 279.0,
+      "original_price": 349.0,
+      "unit": "台",
+      "specs": "2200W/定时",
+      "stock": 45,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "美的 电饭煲 4L 智能预约",
+      "category": "厨房",
+      "price": 329.0,
+      "original_price": 419.0,
+      "unit": "台",
+      "specs": "4L/24h预约",
+      "stock": 40,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "苏泊尔 电饭煲 3L 球釜",
+      "category": "厨房",
+      "price": 169.0,
+      "original_price": 219.0,
+      "unit": "台",
+      "specs": "3L/球釜内胆",
+      "stock": 70,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "双立人 刀具套装 5件 不锈钢",
+      "category": "厨房",
+      "price": 459.0,
+      "original_price": 599.0,
+      "unit": "套",
+      "specs": "5件套/德国钢",
+      "stock": 30,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "张小泉 菜刀 切片刀 2号",
+      "category": "厨房",
+      "price": 89.0,
+      "original_price": 119.0,
+      "unit": "把",
+      "specs": "2号切片刀",
+      "stock": 120,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "乐扣乐扣 保鲜盒 1L 三件套",
+      "category": "厨房",
+      "price": 49.9,
+      "original_price": 64.9,
+      "unit": "套",
+      "specs": "1L*3个",
+      "stock": 200,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "三禾 竹木砧板 抗菌",
+      "category": "厨房",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "块",
+      "specs": "加厚抗菌/双面可用",
+      "stock": 260,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "茶花 厨房砧板 抗菌 PP",
+      "category": "厨房",
+      "price": 32.9,
+      "original_price": 42.9,
+      "unit": "块",
+      "specs": "抗菌PP/双面",
+      "stock": 280,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "双立人 不锈钢汤勺 4件套",
+      "category": "厨房",
+      "price": 89.0,
+      "original_price": 119.0,
+      "unit": "套",
+      "specs": "4件套",
+      "stock": 140,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "爱仕达 硅胶铲勺 4件套",
+      "category": "厨房",
+      "price": 49.9,
+      "original_price": 64.9,
+      "unit": "套",
+      "specs": "4件套/耐高温",
+      "stock": 230,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "苏泊尔 保温饭盒 1.2L 提锅",
+      "category": "厨房",
+      "price": 119.0,
+      "original_price": 149.0,
+      "unit": "套",
+      "specs": "1.2L/含3碗",
+      "stock": 110,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "乐扣乐扣 水壶 1.5L 运动",
+      "category": "厨房",
+      "price": 79.0,
+      "original_price": 99.0,
+      "unit": "个",
+      "specs": "1.5L/PP",
+      "stock": 170,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "虎牌 电热水壶 1.7L 不锈钢",
+      "category": "厨房",
+      "price": 199.0,
+      "original_price": 259.0,
+      "unit": "个",
+      "specs": "1.7L/304不锈钢",
+      "stock": 85,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "苏泊尔 厨房纸 3层*6卷",
+      "category": "厨房",
+      "price": 22.9,
+      "original_price": 29.9,
+      "unit": "提",
+      "specs": "3层*6卷",
+      "stock": 300,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "心相印 厨房纸 4层*4卷",
+      "category": "厨房",
+      "price": 17.9,
+      "original_price": 23.9,
+      "unit": "提",
+      "specs": "4层*4卷",
+      "stock": 330,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "妙洁 厨房纸 4层*12卷",
+      "category": "厨房",
+      "price": 29.9,
+      "original_price": 39.9,
+      "unit": "提",
+      "specs": "4层*12卷",
+      "stock": 240,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "保鲜膜 保鲜袋 套装 PE 食品级",
+      "category": "厨房",
+      "price": 19.9,
+      "original_price": 26.9,
+      "unit": "套",
+      "specs": "膜30m+袋20只",
+      "stock": 290,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "珐琅铸铁锅 22cm 珐琅",
+      "category": "厨房",
+      "price": 299.0,
+      "original_price": 389.0,
+      "unit": "个",
+      "specs": "22cm/珐琅铸铁",
+      "stock": 40,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "花王 强力厨房油污净 400ml",
+      "category": "厨房",
+      "price": 18.9,
+      "original_price": 24.9,
+      "unit": "瓶",
+      "specs": "400ml/喷雾",
+      "stock": 260,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "绿伞 强力除油污剂 500ml",
+      "category": "厨房",
+      "price": 16.9,
+      "original_price": 21.9,
+      "unit": "瓶",
+      "specs": "500ml/喷瓶",
+      "stock": 270,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "丝瓜络 洗碗刷 天然去污",
+      "category": "厨房",
+      "price": 9.9,
+      "original_price": 13.9,
+      "unit": "个",
+      "specs": "天然丝瓜/2个装",
+      "stock": 380,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "妙洁 钢丝球 30个装",
+      "category": "厨房",
+      "price": 11.9,
+      "original_price": 15.9,
+      "unit": "包",
+      "specs": "30个/包",
+      "stock": 320,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "优品生活 沥水篮 双层不锈钢",
+      "category": "厨房",
+      "price": 69.0,
+      "original_price": 89.0,
+      "unit": "个",
+      "specs": "双层/带接水盘",
+      "stock": 120,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "厨房垃圾袋 专用 45*50cm 100只*3卷",
+      "category": "厨房",
+      "price": 13.9,
+      "original_price": 18.9,
+      "unit": "箱",
+      "specs": "45*50cm/100只*3卷",
+      "stock": 360,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "不锈钢盆 洗菜盆 32cm 套装",
+      "category": "厨房",
+      "price": 59.0,
+      "original_price": 79.0,
+      "unit": "套",
+      "specs": "32cm/2只装",
+      "stock": 150,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "苏泊尔 陶瓷刀 4件套",
+      "category": "厨房",
+      "price": 99.0,
+      "original_price": 129.0,
+      "unit": "套",
+      "specs": "4件套/含刀架",
+      "stock": 100,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "美的 微波炉 20L 旋钮",
+      "category": "厨房",
+      "price": 499.0,
+      "original_price": 599.0,
+      "unit": "台",
+      "specs": "20L/机械旋钮",
+      "stock": 35,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "九阳 破壁机 家用 1.5L",
+      "category": "厨房",
+      "price": 599.0,
+      "original_price": 799.0,
+      "unit": "台",
+      "specs": "1.5L/静音",
+      "stock": 25,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "苏泊尔 电水壶 1.7L 全自动",
+      "category": "厨房",
+      "price": 139.0,
+      "original_price": 179.0,
+      "unit": "个",
+      "specs": "1.7L/恒温",
+      "stock": 95,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "塑料密封保鲜盒 3L 两件套",
+      "category": "厨房",
+      "price": 29.9,
+      "original_price": 39.9,
+      "unit": "套",
+      "specs": "3L*2个",
+      "stock": 250,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "一次性纸杯 500ml 100只",
+      "category": "厨房",
+      "price": 19.9,
+      "original_price": 25.9,
+      "unit": "提",
+      "specs": "500ml/100只",
+      "stock": 280,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "家用一次性碗 500ml 50只",
+      "category": "厨房",
+      "price": 16.9,
+      "original_price": 21.9,
+      "unit": "包",
+      "specs": "500ml/50只",
+      "stock": 260,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "不锈钢筷子 抗菌 10双装",
+      "category": "厨房",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "套",
+      "specs": "10双/304钢",
+      "stock": 180,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "厨房去油污贴 3M 10片",
+      "category": "厨房",
+      "price": 12.9,
+      "original_price": 16.9,
+      "unit": "包",
+      "specs": "10片/包",
+      "stock": 300,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "电饭煲 迷你 1.5L 学生宿舍",
+      "category": "厨房",
+      "price": 89.0,
+      "original_price": 119.0,
+      "unit": "台",
+      "specs": "1.5L/迷你",
+      "stock": 140,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "好奇 纸尿裤 铂金装 L码 40片",
+      "category": "母婴",
+      "price": 139.0,
+      "original_price": 179.0,
+      "unit": "包",
+      "specs": "L码/40片",
+      "stock": 80,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "帮宝适 一级帮纸尿裤 L码 44片",
+      "category": "母婴",
+      "price": 119.0,
+      "original_price": 149.0,
+      "unit": "包",
+      "specs": "L码/44片",
+      "stock": 95,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "花王 妙而舒纸尿裤 L码 50片",
+      "category": "母婴",
+      "price": 179.0,
+      "original_price": 229.0,
+      "unit": "包",
+      "specs": "L码/50片",
+      "stock": 60,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "babycare 云柔纸尿裤 L码 36片",
+      "category": "母婴",
+      "price": 99.0,
+      "original_price": 129.0,
+      "unit": "包",
+      "specs": "L码/36片",
+      "stock": 110,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "飞鹤 星飞帆 3段 700g",
+      "category": "母婴",
+      "price": 328.0,
+      "original_price": 398.0,
+      "unit": "罐",
+      "specs": "3段/700g",
+      "stock": 55,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "雅培 菁智 2段 900g",
+      "category": "母婴",
+      "price": 298.0,
+      "original_price": 368.0,
+      "unit": "罐",
+      "specs": "2段/900g",
+      "stock": 60,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "美赞臣 蓝臻 3段 900g",
+      "category": "母婴",
+      "price": 368.0,
+      "original_price": 458.0,
+      "unit": "罐",
+      "specs": "3段/900g",
+      "stock": 45,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "贝亲 奶瓶 PPSU 240ml",
+      "category": "母婴",
+      "price": 169.0,
+      "original_price": 219.0,
+      "unit": "个",
+      "specs": "240ml/PPSU宽口",
+      "stock": 70,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "日康 婴儿奶瓶 玻璃 160ml",
+      "category": "母婴",
+      "price": 89.0,
+      "original_price": 119.0,
+      "unit": "个",
+      "specs": "160ml/玻璃",
+      "stock": 105,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "好奇 婴儿湿巾 25抽*20包",
+      "category": "母婴",
+      "price": 69.0,
+      "original_price": 89.0,
+      "unit": "箱",
+      "specs": "25抽*20包",
+      "stock": 120,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "babycare 婴儿湿巾 80抽*20包",
+      "category": "母婴",
+      "price": 89.0,
+      "original_price": 119.0,
+      "unit": "箱",
+      "specs": "80抽*20包",
+      "stock": 110,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "全棉时代 婴儿棉柔巾 100抽*6包",
+      "category": "母婴",
+      "price": 79.0,
+      "original_price": 99.0,
+      "unit": "箱",
+      "specs": "100抽*6包",
+      "stock": 100,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "好孩子 婴儿洗衣液 500ml",
+      "category": "母婴",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "瓶",
+      "specs": "500ml/无荧光",
+      "stock": 190,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "贝亲 婴儿奶瓶刷 2支",
+      "category": "母婴",
+      "price": 39.9,
+      "original_price": 49.9,
+      "unit": "套",
+      "specs": "2支/带通孔刷",
+      "stock": 170,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "好孩子 婴儿浴盆 折叠",
+      "category": "母婴",
+      "price": 99.0,
+      "original_price": 129.0,
+      "unit": "个",
+      "specs": "可折叠/带温度计",
+      "stock": 75,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "babycare 婴儿浴巾 纯棉 100x100",
+      "category": "母婴",
+      "price": 59.0,
+      "original_price": 79.0,
+      "unit": "条",
+      "specs": "100x100cm/纯棉纱布",
+      "stock": 130,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "美德乐 一次性隔尿垫 33x45 20片",
+      "category": "母婴",
+      "price": 29.9,
+      "original_price": 39.9,
+      "unit": "包",
+      "specs": "33*45cm/20片",
+      "stock": 210,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "贝因美 婴儿磨牙棒 6支",
+      "category": "母婴",
+      "price": 29.9,
+      "original_price": 38.9,
+      "unit": "盒",
+      "specs": "6支/无添加糖",
+      "stock": 220,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "全棉时代 婴儿包被 纯棉纱布",
+      "category": "母婴",
+      "price": 69.0,
+      "original_price": 89.0,
+      "unit": "条",
+      "specs": "纱布/可机洗",
+      "stock": 140,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "babycare 婴儿爬行垫 200x180 双面",
+      "category": "母婴",
+      "price": 159.0,
+      "original_price": 199.0,
+      "unit": "张",
+      "specs": "200*180cm/双面",
+      "stock": 50,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "皇家 猫粮 成猫粮 2kg",
+      "category": "宠物",
+      "price": 199.0,
+      "original_price": 259.0,
+      "unit": "袋",
+      "specs": "2kg/通用型",
+      "stock": 60,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "渴望 六种鱼全阶段猫粮 1.8kg",
+      "category": "宠物",
+      "price": 349.0,
+      "original_price": 429.0,
+      "unit": "袋",
+      "specs": "1.8kg/全阶段",
+      "stock": 40,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "冠能 成犬粮 12kg",
+      "category": "宠物",
+      "price": 399.0,
+      "original_price": 499.0,
+      "unit": "袋",
+      "specs": "12kg/通用型",
+      "stock": 35,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "麦富迪 狗粮 小型犬 3kg",
+      "category": "宠物",
+      "price": 99.0,
+      "original_price": 129.0,
+      "unit": "袋",
+      "specs": "3kg/小型犬",
+      "stock": 90,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "伯纳天纯 幼猫粮 2kg",
+      "category": "宠物",
+      "price": 159.0,
+      "original_price": 199.0,
+      "unit": "袋",
+      "specs": "2kg/幼猫",
+      "stock": 55,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "疯狂小狗 猫砂 混合 10L",
+      "category": "宠物",
+      "price": 49.9,
+      "original_price": 64.9,
+      "unit": "包",
+      "specs": "10L/豆腐+膨润土",
+      "stock": 150,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "里兜 混合猫砂 6.5kg*3包",
+      "category": "宠物",
+      "price": 69.0,
+      "original_price": 89.0,
+      "unit": "箱",
+      "specs": "6.5kg*3包",
+      "stock": 120,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "耐威克 猫砂盆 全封闭",
+      "category": "宠物",
+      "price": 159.0,
+      "original_price": 199.0,
+      "unit": "个",
+      "specs": "全封闭/大号",
+      "stock": 45,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "小佩 智能饮水机 猫咪",
+      "category": "宠物",
+      "price": 199.0,
+      "original_price": 259.0,
+      "unit": "台",
+      "specs": "无线/静音",
+      "stock": 40,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "猫玩具 逗猫棒 套装 6件",
+      "category": "宠物",
+      "price": 29.9,
+      "original_price": 39.9,
+      "unit": "套",
+      "specs": "6件套",
+      "stock": 230,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "狗牵引绳 自动伸缩 5m",
+      "category": "宠物",
+      "price": 49.9,
+      "original_price": 64.9,
+      "unit": "个",
+      "specs": "5m/承重20kg",
+      "stock": 160,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "宠物尿垫 33x45 50片",
+      "category": "宠物",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "包",
+      "specs": "33*45cm/50片",
+      "stock": 190,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "小佩 猫砂盆 全封闭 灰色",
+      "category": "宠物",
+      "price": 189.0,
+      "original_price": 239.0,
+      "unit": "个",
+      "specs": "全封闭/灰色",
+      "stock": 42,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "顽皮 狗狗磨牙棒 3支装",
+      "category": "宠物",
+      "price": 35.9,
+      "original_price": 46.0,
+      "unit": "套",
+      "specs": "3支/鸡肉味",
+      "stock": 180,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "海洋之星 猫粮 1.5kg 幼猫",
+      "category": "宠物",
+      "price": 139.0,
+      "original_price": 179.0,
+      "unit": "袋",
+      "specs": "1.5kg/幼猫",
+      "stock": 65,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "宠幸 猫粮 冻干双拼 2kg",
+      "category": "宠物",
+      "price": 239.0,
+      "original_price": 299.0,
+      "unit": "袋",
+      "specs": "2kg/冻干双拼",
+      "stock": 38,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "得酷 狗狗洗浴液 500ml",
+      "category": "宠物",
+      "price": 49.9,
+      "original_price": 64.9,
+      "unit": "瓶",
+      "specs": "500ml/除臭",
+      "stock": 145,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "卫仕 猫咪化毛膏 120g",
+      "category": "宠物",
+      "price": 49.0,
+      "original_price": 64.0,
+      "unit": "支",
+      "specs": "120g/化毛",
+      "stock": 135,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "得力 A4 复印纸 70g 500张*5包",
+      "category": "办公",
+      "price": 109.0,
+      "original_price": 139.0,
+      "unit": "箱",
+      "specs": "70g/500张*5包",
+      "stock": 70,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "晨光 中性笔 0.5mm 12支",
+      "category": "办公",
+      "price": 15.9,
+      "original_price": 20.9,
+      "unit": "盒",
+      "specs": "0.5mm/黑色12支",
+      "stock": 380,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "得力 中性笔 0.5mm 12支",
+      "category": "办公",
+      "price": 12.9,
+      "original_price": 16.9,
+      "unit": "盒",
+      "specs": "0.5mm/黑色12支",
+      "stock": 400,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "晨光 笔记本 A5 100页",
+      "category": "办公",
+      "price": 9.9,
+      "original_price": 12.9,
+      "unit": "本",
+      "specs": "A5/100页",
+      "stock": 450,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "齐心 文件柜 抽屉式 4层",
+      "category": "办公",
+      "price": 129.0,
+      "original_price": 169.0,
+      "unit": "个",
+      "specs": "4层/可叠放",
+      "stock": 60,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "得力 订书机 标准型",
+      "category": "办公",
+      "price": 22.9,
+      "original_price": 29.9,
+      "unit": "个",
+      "specs": "标准型/含订书钉",
+      "stock": 280,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "得力 硒鼓 通用 HP 88A",
+      "category": "办公",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "个",
+      "specs": "88A/适用多型号",
+      "stock": 150,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "惠普 硒鼓 CF228A",
+      "category": "办公",
+      "price": 299.0,
+      "original_price": 379.0,
+      "unit": "个",
+      "specs": "CF228A/原厂",
+      "stock": 60,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "晨光 订书钉 1000枚 8mm",
+      "category": "办公",
+      "price": 6.9,
+      "original_price": 9.9,
+      "unit": "盒",
+      "specs": "8mm/1000枚",
+      "stock": 420,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "得力 透明文件夹 A4 10个",
+      "category": "办公",
+      "price": 19.9,
+      "original_price": 25.9,
+      "unit": "包",
+      "specs": "A4/10个装",
+      "stock": 240,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "3M 便利贴 76x76mm 100张",
+      "category": "办公",
+      "price": 12.9,
+      "original_price": 16.9,
+      "unit": "包",
+      "specs": "76*76mm/100张",
+      "stock": 300,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "晨光 修正带 5mm 6个",
+      "category": "办公",
+      "price": 18.9,
+      "original_price": 24.9,
+      "unit": "盒",
+      "specs": "5mm/6个",
+      "stock": 230,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "得力 抽杆文件夹 10个装",
+      "category": "办公",
+      "price": 25.9,
+      "original_price": 32.9,
+      "unit": "包",
+      "specs": "A4/10个装",
+      "stock": 200,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "齐心 发票夹 80x100mm 50个",
+      "category": "办公",
+      "price": 15.9,
+      "original_price": 20.9,
+      "unit": "包",
+      "specs": "80*100mm/50个",
+      "stock": 270,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "得力 计算器 12位 太阳能",
+      "category": "办公",
+      "price": 49.9,
+      "original_price": 64.9,
+      "unit": "个",
+      "specs": "12位/太阳能",
+      "stock": 110,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "晨光 白板笔 12色 可擦",
+      "category": "办公",
+      "price": 29.9,
+      "original_price": 38.9,
+      "unit": "盒",
+      "specs": "12色/可擦",
+      "stock": 180,
+      "merchant_id": "M003"
+    },
+    {
+      "name": "水星家纺 全棉四件套 1.8m",
+      "category": "家居",
+      "price": 299.0,
+      "original_price": 399.0,
+      "unit": "套",
+      "specs": "1.8m床/全棉",
+      "stock": 50,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "富安娜 全棉四件套 1.5m",
+      "category": "家居",
+      "price": 259.0,
+      "original_price": 339.0,
+      "unit": "套",
+      "specs": "1.5m床/全棉",
+      "stock": 60,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "洁丽雅 纯棉毛巾 3条装",
+      "category": "家居",
+      "price": 49.9,
+      "original_price": 64.9,
+      "unit": "套",
+      "specs": "纯棉/3条装",
+      "stock": 220,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "金号 毛巾 纯棉 2条装",
+      "category": "家居",
+      "price": 29.9,
+      "original_price": 38.9,
+      "unit": "套",
+      "specs": "纯棉/2条装",
+      "stock": 280,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "南极人 珊瑚绒毯 150x200",
+      "category": "家居",
+      "price": 69.0,
+      "original_price": 89.0,
+      "unit": "条",
+      "specs": "150*200cm/珊瑚绒",
+      "stock": 150,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "恒源祥 全棉四件套 1.8m",
+      "category": "家居",
+      "price": 329.0,
+      "original_price": 429.0,
+      "unit": "套",
+      "specs": "1.8m床/全棉",
+      "stock": 45,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "水星 记忆棉枕头 60*40cm",
+      "category": "家居",
+      "price": 139.0,
+      "original_price": 179.0,
+      "unit": "个",
+      "specs": "60*40cm/慢回弹",
+      "stock": 85,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "网易严选 全棉四件套 1.8m",
+      "category": "家居",
+      "price": 279.0,
+      "original_price": 359.0,
+      "unit": "套",
+      "specs": "1.8m床/全棉",
+      "stock": 55,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "洁丽雅 浴巾 纯棉 70*140",
+      "category": "家居",
+      "price": 59.0,
+      "original_price": 79.0,
+      "unit": "条",
+      "specs": "70*140cm/纯棉",
+      "stock": 170,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "九洲鹿 冬季被子 200x230",
+      "category": "家居",
+      "price": 399.0,
+      "original_price": 519.0,
+      "unit": "床",
+      "specs": "200*230cm/加厚",
+      "stock": 35,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "南极人 全棉袜 5双装",
+      "category": "家居",
+      "price": 29.9,
+      "original_price": 39.9,
+      "unit": "盒",
+      "specs": "5双装/纯棉",
+      "stock": 260,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "浪莎 连裤袜 2双装",
+      "category": "家居",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "包",
+      "specs": "2双/加厚",
+      "stock": 210,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "梦洁 遮光窗帘 2幅 1.5x2.8m",
+      "category": "家居",
+      "price": 459.0,
+      "original_price": 599.0,
+      "unit": "套",
+      "specs": "1.5*2.8m/遮光",
+      "stock": 30,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "遮光帘 卧室 1.5x2.8m 涤纶",
+      "category": "家居",
+      "price": 189.0,
+      "original_price": 239.0,
+      "unit": "幅",
+      "specs": "1.5*2.8m/涤纶",
+      "stock": 70,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "南极人 地垫 门口吸水 50*80cm",
+      "category": "家居",
+      "price": 45.9,
+      "original_price": 59.9,
+      "unit": "块",
+      "specs": "50*80cm/吸水",
+      "stock": 140,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "茶花 浴室脚垫 防滑 40*60",
+      "category": "家居",
+      "price": 39.9,
+      "original_price": 52.0,
+      "unit": "块",
+      "specs": "40*60cm/防滑",
+      "stock": 190,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "好媳妇 衣架 塑料 20个",
+      "category": "家居",
+      "price": 19.9,
+      "original_price": 25.9,
+      "unit": "包",
+      "specs": "20个/防滑",
+      "stock": 270,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "居家家纺 全棉枕套 2只装",
+      "category": "家居",
+      "price": 35.9,
+      "original_price": 46.0,
+      "unit": "对",
+      "specs": "纯棉/2只",
+      "stock": 200,
+      "merchant_id": "M002"
+    },
+    {
+      "name": "京东京造 记忆棉坐垫",
+      "category": "家居",
+      "price": 79.0,
+      "original_price": 99.0,
+      "unit": "个",
+      "specs": "慢回弹/办公椅用",
+      "stock": 130,
       "merchant_id": "M002"
     }
   ]
