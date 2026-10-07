@@ -340,3 +340,30 @@ HTTP 鉴权 10/10 项通过
 ============================================================
 
 ```
+
+---
+
+## 2. 干净克隆复现证明
+
+审核可直接照跑，验证仓库从零可复现（不依赖开发机任何残留状态）：
+
+```bash
+git clone https://github.com/opc007/agentmall.git && cd agentmall
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+for t in test_readonly demo_chain test_roles test_http_auth test_roadshow test_admin_console; do
+  python tests/$t.py
+done
+```
+
+实测结果（全新克隆 + 全新 venv，`mcp` 自动解析到 1.30.0）：
+
+| 测试 | 结果 |
+|---|---|
+| test_readonly | READONLY GUARD PASSED |
+| demo_chain | 演示链路 17/17 项通过 |
+| test_roles | ROLES TESTS PASSED ✅ |
+| test_http_auth | HTTP 鉴权 10/10 项通过 |
+| test_roadshow | 路演链路 22/22 项通过 |
+| test_admin_console | 管理后台 22/22 项通过 |
+
+或更简单：`./scripts/start_demo.sh --check`（一键起三个服务并跑完六套测试）。
