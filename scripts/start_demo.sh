@@ -2,7 +2,7 @@
 # AgentMall 一键起全栈（路演用）。
 #
 #   ./scripts/start_demo.sh          起 3 个服务，前台等待 Ctrl-C 退出
-#   ./scripts/start_demo.sh --check  起完自动跑九套测试 + 路演彩排再退出
+#   ./scripts/start_demo.sh --check  起完自动跑十套测试 + 路演彩排再退出
 #
 # 三个服务：
 #   :8000  用户面 Web   —— 注册/登录/个人中心/订单列表/模拟收银台
@@ -81,9 +81,9 @@ cat <<BANNER
 BANNER
 
 if [ "${1:-}" = "--check" ]; then
-  echo "▶ 跑九套测试…"
+  echo "▶ 跑十套测试…"
   FAILED=0
-  for t in test_readonly demo_chain test_roles test_http_auth test_roadshow test_admin_console test_sourcing test_restart test_user_isolation; do
+  for t in test_readonly demo_chain test_roles test_http_auth test_roadshow test_admin_console test_sourcing test_restart test_user_isolation test_edge_cases; do
     printf "  %-20s " "$t"
     if out="$("$PY" "tests/$t.py" 2>&1)"; then
       echo "$out" | grep -oE "PASSED.*|链路 [0-9]+/[0-9]+ 项通过|鉴权 [0-9]+/[0-9]+ 项通过|管理后台 [0-9]+/[0-9]+ 项通过|适配层 [0-9]+/[0-9]+ 项通过|[0-9]+/[0-9]+ 项通过" | tail -1

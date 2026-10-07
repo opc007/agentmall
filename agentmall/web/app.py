@@ -542,3 +542,42 @@ app = FastAPI(
 app.include_router(router)
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+# ---------------------------------------------------------------- 兜底错误页
+# 真实用户会输错网址、点到过期的链接。以前这里直接吐 FastAPI 的裸 JSON
+# {"detail":"Not Found"}，看着像坏了而不是像站点。改成带导航的友好页面。
+@app.exception_handler(404)
+async def _not_found(request: Request, exc):
+    if request.url.path.startswith(("/api/", "/static/")):
+        return JSONResponse({"ok": False, "error": "资源不存在"}, status_code=404)
+    try:
+        return templates.TemplateResponse(
+            request, "error_404.html",
+            {"request": request, "user": _safe_user(request), "base": ""},
+            status_code=404)
+    except Exception:
+        return HTMLResponse(
+            '<meta charset="utf-8"><h1>404 · 页面不存在</h1>'
+            '<p><a href="/">回首页</a></p>', status_code=404)
+
+
+@app.exception_handler(500)
+async def _server_error(request: Request, exc):
+    """别把栈信息甩给用户——演示现场崩了要能圆回来。"""
+    try:
+        return templates.TemplateResponse(
+            request, "error_500.html",
+            {"request": request, "user": _safe_user(request), "base": ""},
+            status_code=500)
+    except Exception:
+        return HTMLResponse(
+            '<meta charset="utf-8"><h1>500 · 服务出错了</h1>'
+            '<p><a href="/">回首页</a></p>', status_code=500)
+
+
+def _safe_user(request: Request):
+    try:
+        return current_user(request)
+    except Exception:
+        return None

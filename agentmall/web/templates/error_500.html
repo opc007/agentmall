@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}服务出错了{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>服务出错了</h1>
+  <div class="muted">这一页没能正常打开。</div>
+</div>
+
+<section class="panel">
+  <h2>可以试试</h2>
+  <ul class="steps">
+    <li>刷新一下看看（演示环境偶发的瞬时问题，刷新通常就好了）；</li>
+    <li>还是不行就回<a href="/">首页</a>，从头再走一遍；</li>
+    <li>如果持续出错，说明服务进程可能挂了，重新执行
+        <code>./scripts/start_demo.sh</code> 即可。</li>
+  </ul>
+</section>
+
+<div class="btn-row">
+  <a class="btn" href="/">← 回首页</a>
+  <a class="btn btn-ghost" href="/orders">我的订单</a>
+</div>
+{% endblock %}

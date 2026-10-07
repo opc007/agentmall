@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}页面不存在{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>页面不存在</h1>
+  <div class="muted">你访问的地址可能输错了，或者链接已过期。</div>
+</div>
+
+<section class="panel">
+  <h2>你可能想去这里</h2>
+  <ul class="steps">
+    <li><a href="/">首页</a> —— 看演示说明</li>
+    <li><a href="/me">个人中心</a> —— 拿 MCP 接入点</li>
+    <li><a href="/orders">我的订单</a> —— 看订单和付款</li>
+    <li>如果你是在扫收银台的二维码：先回到 <a href="/orders">我的订单</a>，
+        再点那一单旁边的「去支付」。</li>
+  </ul>
+</section>
+
+<div class="btn-row">
+  <a class="btn" href="/">← 回首页</a>
+  <a class="btn btn-ghost" href="/orders">我的订单</a>
+</div>
+{% endblock %}
