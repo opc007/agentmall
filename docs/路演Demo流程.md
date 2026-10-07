@@ -21,5 +21,6 @@
 
 ## 备注
 
-- 扫码支付为 prototype 模拟，不接真实支付网关（checkout hands off 原则不变）
+- 商品为爬取/整理的演示数据（页面明确标注"演示数据"）；生产环境切 1688 官方 API（见 docs/货源接口选型.md）
+- 扫码支付为 `MockPaymentGateway` 模拟，不接真实支付网关（checkout hands off 原则不变）；`PaymentGateway` 接口已预留，真实网关以后只换实现类
 - 公网部署需要服务器（用户准备）；今晚先本地跑通全链路
