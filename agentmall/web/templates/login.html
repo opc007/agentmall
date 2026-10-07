@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}登录{% endblock %}
+
+{% block content %}
+<section class="form-wrap">
+  <h1>登录 AgentMall</h1>
+  <p class="muted">登录后可以拿 MCP 接入点、查看并支付订单。</p>
+
+  {% if error %}<div class="alert alert-error">❌ {{ error }}</div>{% endif %}
+
+  <form method="post" action="/login" class="form">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <label>用户名
+      <input type="text" name="username" required autocomplete="username"
+             placeholder="用户名" autofocus>
+    </label>
+    <label>密码
+      <input type="password" name="password" required autocomplete="current-password"
+             placeholder="密码">
+    </label>
+    <button type="submit" class="btn btn-lg btn-block">登录</button>
+  </form>
+
+  <p class="muted center">还没有账号？<a href="/register">去注册</a></p>
+  <p class="hint">演示账号：<code>demo</code> / <code>demo123</code></p>
+</section>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}我的订单{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>我的订单</h1>
+  <div class="live">
+    <span class="live-dot"></span>实时刷新中（每 5 秒）
+    <span class="muted" id="last-sync">—</span>
+  </div>
+</div>
+
+{% if from_pool %}
+<div class="alert alert-info">
+  ℹ️ 你名下暂无订单，下面显示的是<b>智能体通过 MCP 直接建单</b>、尚未绑定用户的演示订单
+  （演示环境自动归属当前用户）。订单一旦支付完成即变「已完成」。
+</div>
+{% endif %}
+
+{% if orders %}
+<table class="table table-orders">
+  <thead>
+    <tr>
+      <th>订单号</th><th>商品</th><th>收货地址</th><th>金额</th>
+      <th>状态</th><th>创建时间</th><th>操作</th>
+    </tr>
+  </thead>
+  <tbody id="orders-body">
+    {% for o in orders %}
+    <tr data-order-id="{{ o.order_id }}">
+      <td><code>{{ o.order_id }}</code>{% if o.is_demo %}<span class="tag-demo">演示</span>{% endif %}</td>
+      <td class="cell-items">{{ o.items_brief }}</td>
+      <td class="muted">{{ o.address }}</td>
+      <td class="num">¥{{ o.total | money }}</td>
+      <td class="cell-status">
+        <span class="badge {{ 'badge-wait' if o.payable else 'badge-done' }}">{{ o.status }}</span>
+      </td>
+      <td class="muted">{{ o.created_at | dt }}</td>
+      <td class="cell-action">
+        {% if o.payable %}
+          <a class="btn btn-sm btn-pay" href="/pay/{{ o.order_id }}">去支付</a>
+        {% else %}<span class="muted">—</span>{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty-box">
+  <p class="empty-big">还没有订单</p>
+  <p class="muted">把 <a href="/me">个人中心</a> 的 MCP 接入点配给智能体，让它帮你建一单，订单会实时出现在这里。</p>
+</div>
+{% endif %}
+
+<div class="btn-row">
+  <a class="btn btn-ghost" href="/me">← 回个人中心</a>
+  <a class="btn btn-ghost" href="/">← 回首页</a>
+</div>
+{% endblock %}
+
+{% block head %}
+<script>
+{% if orders %}
+// 状态实时刷新：每 5 秒拉一次 /api/orders（no-store），只改状态格和按钮，
+// 不整页 reload —— 投屏演示时不闪屏。
+var POLL_MS = 5000;
+var STATUS_TONE = {'待支付': 'badge-wait'};
+
+function paint(row, o) {
+  var st = row.querySelector('.cell-status');
+  var act = row.querySelector('.cell-action');
+  if (st) {
+    st.innerHTML = '<span class="badge ' + (STATUS_TONE[o.status] || 'badge-done') + '">' + o.status + '</span>';
+  }
+  if (act) {
+    act.innerHTML = o.payable
+      ? '<a class="btn btn-sm btn-pay" href="/pay/' + o.order_id + '">去支付</a>'
+      : '<span class="muted">—</span>';
+  }
+  var items = row.querySelector('.cell-items');
+  if (items && o.items_brief) { items.textContent = o.items_brief; }
+}
+
+async function poll() {
+  try {
+    const r = await fetch('/api/orders', {cache: 'no-store', headers: {'Accept': 'application/json'}});
+    if (!r.ok) return;
+    const data = await r.json();
+    if (!data.ok) return;
+    const byId = {};
+    data.orders.forEach(function (o) { byId[o.order_id] = o; });
+    document.querySelectorAll('#orders-body tr[data-order-id]').forEach(function (row) {
+      const o = byId[row.getAttribute('data-order-id')];
+      if (o) paint(row, o);
+    });
+    const ts = document.getElementById('last-sync');
+    if (ts) {
+      const d = new Date();
+      const p = function (n) { return (n < 10 ? '0' : '') + n; };
+      ts.textContent = '最后同步 ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+    }
+  } catch (e) { /* 演示环境网络抖动忽略即可 */ }
+}
+poll();
+setInterval(poll, POLL_MS);
+{% endif %}
+</script>
+{% endblock %}

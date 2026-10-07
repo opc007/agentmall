@@ -3,7 +3,8 @@
 **智能体原生的日用消费品采购 MCP Server（开源 MVP）**
 *Agent-native daily-needs shopping via MCP — open source MVP.*
 
-> 🚧 当前状态：MVP 开发中（6 小时可用基础版）
+> 🚧 当前状态：Phase 2 路演雏形（用户侧闭环已通，管理员/商户侧进行中）
+> 数据与支付均为**演示数据**：商品是整理/采集的公开价格，支付是模拟网关，不发生任何真实交易。
 
 ## 这是什么
 
@@ -18,12 +19,55 @@
 ## 快速开始
 
 ```bash
+python3 -m venv .venv && source .venv/bin/activate   # Linux/macOS
 pip install -r requirements.txt
+
+# 终端 A：Web 前端（注册/登录/个人中心/订单/模拟收银台）→ http://127.0.0.1:8000
+uvicorn agentmall.web.app:app --port 8000
+
+# 终端 B：MCP Server（给 AI 客户端接）→ http://127.0.0.1:8001/mcp
+python -m agentmall.http_server
+```
+
+本地 AI 客户端（Claude Code / Cursor 等）也可以直接用 stdio：
+
+```bash
 python -m agentmall.server
 ```
 
-然后在支持 MCP 的客户端（Claude Code / Claude Desktop / Cursor 等）中接入，
-`server.py` 即 MCP Server（stdio）。详细开发说明见 [docs/开发任务书.md](docs/开发任务书.md)。
+> Windows 用 `.venv\Scripts\activate`。若系统 pip 报 `externally-managed-environment`
+> （PEP 668），说明该 Python 禁止全局装包——用上面的 venv 即可，这是推荐做法。
+
+> ⚠️ **必须装 `mcp<2`**：`requirements.txt` 已锁 `mcp>=1.8,<2`。
+> mcp 2.x 把 `FastMCP` 更名为 `MCPServer`，`mcp.server.fastmcp` 会直接 ImportError，
+> 导致 Server 无法启动。迁 v2 属后续事项。
+
+## 三角色接入（per-agent key）
+
+每个请求带 `Authorization: Bearer <key>`，key 决定角色，Server **只注册该角色的 tool**：
+
+| 角色 | 工具数 | 演示 key |
+|------|-------|---------|
+| 用户 | 4 | `uk_demo_user_secret` |
+| 管理员 | 5 | `ak_demo_admin_secret` |
+| 商户 | 5 | `mk_demo_m001_secret` / `mk_demo_m002_secret` / `mk_demo_m003_secret` |
+
+stdio 模式下用环境变量指定角色：`AGENTMALL_API_KEY=ak_demo_admin_secret python -m agentmall.server`
+`GET /whoami` 可以随时查当前 key 被解析成什么角色、能看到哪些 tool。
+
+## 一键验证（不用接客户端）
+
+想快速确认整条链路是否正常，可直接跑内置的 MCP stdio client——它以真实 MCP 协议
+逐个调用 4 个 tool，复现 [demo/演示脚本.md](demo/演示脚本.md) 的全链路：
+
+```bash
+python tests/demo_chain.py       # 用户侧全链路（stdio 真实协议），17 项断言
+python tests/test_readonly.py    # 只读边界守卫
+python tests/test_roles.py       # 管理员/商户权限与审核流
+python tests/test_http_auth.py   # streamable-http 接入 + 越权拒绝 + 审计
+```
+
+最近一次完整输出见 [demo/演示输出.md](demo/演示输出.md)。
 
 ## MCP Tools（一期）
 

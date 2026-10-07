@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}注册{% endblock %}
+
+{% block content %}
+<section class="form-wrap">
+  <h1>注册 AgentMall</h1>
+  <p class="muted">只需用户名 + 密码。注册成功会自动登录并进入个人中心。</p>
+
+  {% if error %}<div class="alert alert-error">❌ {{ error }}</div>{% endif %}
+
+  <form method="post" action="/register" class="form">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <label>用户名
+      <input type="text" name="username" required minlength="2" maxlength="32"
+             autocomplete="username" placeholder="至少 2 个字符" autofocus>
+    </label>
+    <label>密码
+      <input type="password" name="password" required minlength="6"
+             autocomplete="new-password" placeholder="至少 6 位">
+    </label>
+    <button type="submit" class="btn btn-lg btn-block">注册并进入个人中心</button>
+  </form>
+
+  <p class="muted center">已有账号？<a href="/login">去登录</a></p>
+  <p class="hint">演示账号：<code>demo</code> / <code>demo123</code></p>
+</section>
+{% endblock %}
