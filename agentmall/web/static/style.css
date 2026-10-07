@@ -228,6 +228,26 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 .pay-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; align-items: start; }
 @media (max-width: 860px) { .pay-grid { grid-template-columns: 1fr; } }
 
+/* ===== 手机端 =====
+   路演第 7 步是「手机扫码打开收银台」，所以收银台和订单页必须在手机上能看。
+   订单表 7 列、个人中心 5 列，窄屏必然横向溢出——这里让表格块自己横向滚动，
+   而不是把整页撑宽（整页撑宽会导致页面左右抖动，点错按钮）。 */
+@media (max-width: 720px) {
+  .wrap { padding: 8px 14px 32px; }
+  .topbar { flex-wrap: wrap; gap: 8px; }
+  .nav { gap: 12px; flex-wrap: wrap; }
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
+  .table-scroll > .table { min-width: 560px; }
+  .table th, .table td { padding: 10px 12px; }
+  .table-orders td, .table-orders th { font-size: .95rem; }
+  .demo-banner-sub { display: block; margin-top: 2px; }
+  h1 { font-size: 1.5rem; }
+  .qr { max-width: 220px; }
+  /* 收银台在手机上：金额和按钮要够大，是全场唯一要点的按钮 */
+  .btn-xl { font-size: 1.05rem; padding: 14px 20px; }
+  .big-num { font-size: 1.5rem; }
+}
+
 .pay-form { margin-top: 24px; }
 .pay-hint { color: var(--ink-soft); font-size: .95rem; margin-top: 12px; }
 

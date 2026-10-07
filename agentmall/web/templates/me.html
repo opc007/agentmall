@@ -21,11 +21,17 @@
   </div>
 
   <ol class="steps">
-    <li>复制上面这段 JSON；</li>
-    <li>打开你的 AI 客户端（Claude Code / Claude Desktop / Cursor 等）的 MCP 配置；</li>
-    <li>粘贴保存，让智能体连上 AgentMall；</li>
+    <li>复制上面这段 JSON（<b>远程 Streamable HTTP</b> 接入格式）；</li>
+    <li>粘进支持<b>远程 MCP</b>的客户端配置：<b>Cursor、Cherry Studio、VS Code / Copilot</b>，
+        或在 <b>Claude Code</b> 里执行
+        <code>claude mcp add --transport http agentmall &lt;上面的 url&gt; --header "Authorization: Bearer &lt;你的 api_key&gt;"</code>；</li>
+    <li>保存后确认工具列表里有 <b>4 个</b>（search_products / get_product / create_order / get_order）；</li>
     <li>对智能体说：「帮我找最便宜的抽纸，30 元以内，送到南宁市朝阳广场」。</li>
   </ol>
+  <p class="muted small">
+    ⚠️ <b>Claude Desktop 不支持远程 MCP</b>，只认本地 stdio 服务端，需先在本机装一份服务端程序，
+    当前尚未发布。所以这段 JSON <b>不要</b>粘进 Claude Desktop（会提示找不到 command 而失败）。
+  </p>
 </section>
 
 <!-- ===== api_key 明文 ===== -->
@@ -43,6 +49,7 @@
 <section class="panel">
   <h2>③ 我的订单（最近 10 条）</h2>
   {% if recent_orders %}
+    <div class="table-scroll">
     <table class="table">
       <thead>
         <tr><th>订单号</th><th>商品</th><th>金额</th><th>状态</th><th>操作</th></tr>
@@ -59,6 +66,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
     <a class="btn btn-ghost" href="/orders">查看全部订单 →</a>
   {% else %}
     <p class="empty">还没有订单。把上面的 MCP 接入点配给智能体，让它帮你下一单吧。</p>

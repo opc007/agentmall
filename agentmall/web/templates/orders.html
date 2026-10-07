@@ -18,6 +18,7 @@
 {% endif %}
 
 {% if orders %}
+<div class="table-scroll">
 <table class="table table-orders">
   <thead>
     <tr>
@@ -45,6 +46,7 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
 {% else %}
 <div class="empty-box">
   <p class="empty-big">还没有订单</p>

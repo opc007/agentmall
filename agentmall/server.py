@@ -111,9 +111,18 @@ def create_order(product_id: str, quantity: int, address: str,
     """创建订单（辅助支付）。
     校验库存并扣减，返回订单号与收银台链接；
     用户需自行在浏览器点击完成付款，智能体不自动扣款。"""
+    actor = _actor()
     if not _enabled("create_order"):
-        return auth.deny_unauthorized(_actor(), "create_order")
-    return store.create_order(product_id, quantity, address, note)
+        return auth.deny_unauthorized(actor, "create_order")
+    # 订单必须归属到调用它的那个用户（2026-10-07 修）。
+    # 之前这里没传 user_id → 智能体建的单 user_id 全是 NULL，网页层只能退而用
+    # 「未绑定订单池」兜底，而那个池子对**所有**登录用户可见可付——
+    # 实测：另一个真人注册后能看到并付款别人的订单，直接破掉「用户只能看自己单」
+    # 这条合规红线。store.create_order 早就接受 user_id 参数，只是没人传。
+    uid = ""
+    if actor and actor.get("actor_id") not in (None, "", "anonymous"):
+        uid = str(actor["actor_id"])
+    return store.create_order(product_id, quantity, address, note, user_id=uid)
 
 
 @_reg("get_order")

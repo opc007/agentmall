@@ -290,31 +290,47 @@ def mcp_config(base_url: str, api_key: str) -> dict:
 
 
 # ---------------------------------------------------------------- 订单可见性
+def _user_count() -> int:
+    try:
+        conn = db.connect()
+        try:
+            return int(conn.execute("SELECT COUNT(*) c FROM users").fetchone()["c"])
+        finally:
+            conn.close()
+    except Exception:
+        return 999  # 读不出来就按「多人」处理，宁可不给看
+
+
 def orders_for_user(user_id: str, limit: int = 50) -> tuple[list[dict], bool]:
     """返回 (订单列表, 是否走了「未绑定订单池」兜底)。
 
     正常情况就是 `store.list_orders(user_id=...)`。
 
-    兜底的原因：`server.py` 里的 `create_order` tool 目前没把 key 解析出来的
-    user_id 传进 `store.create_order()`，所以**智能体通过 MCP 建的订单 user_id 是
-    NULL**，路演时用户在网页订单列表里会一条都看不到，整条演示链就断了。
-    server.py 不归我改，这里做个演示专用兜底：本人一单都没有时，把未绑定的
-    演示订单当作「智能体刚建的订单」展示出来，并在页面上标注。
+    兜底只保留给**单用户**的老演示用法：stdio 模式没带 key 时建的订单 user_id
+    是 NULL，网页上会一条都看不到。这种情况下全系统往往只有一个用户，把这批未绑定
+    订单当作「智能体刚建的」展示出来，并在页面标注。
 
-    注意这是**演示简化**：所有登录用户都会看到同一批未绑定订单，仅限 demo。
-    等 server.py 侧补上 user_id 之后，这个兜底自然就不再触发（无需改这里）。
+    **2026-10-07 安全修复**：这个池子原先对所有登录用户无条件可见可付，实测另一个
+    真人注册后能看到**并且付款**别人的订单——直接破掉「用户只能看自己的单」这条
+    合规红线。现在加了前提：全系统只有一个用户时才允许兜底，多用户一律不给看。
+    根因（MCP 建单不传 user_id）已在 server.py 修掉，正常链路不再产生未绑定订单。
     """
     store = get_store()
     own = store.list_orders(user_id=user_id, limit=limit)
     if own:
         return own, False
+    if _user_count() > 1:
+        return [], False   # 多人环境：未绑定的订单不属于我，不给看
     pool = [o for o in store.list_orders(limit=limit) if not order_user_id(o)]
     return pool, bool(pool)
 
 
 def can_view_order(order: dict, user_id: str) -> bool:
-    """能不能看/付这一单。本人的单、未绑定（演示兜底）的单可以；别人的单不行。"""
-    return order_user_id(order) in ("", user_id)
+    """能不能看/付这一单。本人的单可以；未绑定的单仅在单用户演示时放行。"""
+    uid = order_user_id(order)
+    if uid:
+        return uid == user_id
+    return _user_count() <= 1
 
 
 # ---------------------------------------------------------------- 渲染helper
