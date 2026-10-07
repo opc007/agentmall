@@ -155,28 +155,38 @@ def _seed(conn: sqlite3.Connection) -> None:
 
 
 def _seed_products(conn: sqlite3.Connection, ts: int) -> None:
-    """优先灌真实采集数据；没有就退回 30 SKU 演示种子。"""
-    real_path = os.path.join(BASE, "data", "products_real.json")
-    if os.path.exists(real_path):
+    """优先灌真实采集数据；没有就退回 30 SKU 演示种子。
+
+    两处路径都认：仓库根 `data/`（scripts/fetch_products.py 的默认输出）
+    和包内 `agentmall/data/`（历史演示种子所在）。
+    """
+    repo_root = os.path.dirname(BASE)
+    candidates = [
+        os.path.join(repo_root, "data", "products_real.json"),
+        os.path.join(BASE, "data", "products_real.json"),
+    ]
+    for real_path in candidates:
+        if not os.path.exists(real_path):
+            continue
         try:
             with open(real_path, encoding="utf-8") as f:
-                payload = json.load(f)
-            rows = payload.get("products", [])
-            if rows:
-                conn.executemany(
-                    "INSERT OR REPLACE INTO products"
-                    "(id,merchant_id,name,category,price,original_price,stock,"
-                    "unit,specs,image_url,status,created_at) "
-                    "VALUES(?,?,?,?,?,?,?,?,?,?,'在售',?)",
-                    [(r.get("id") or f"P{i:03d}", r.get("merchant_id", "M001"),
-                      r["name"], r["category"], float(r["price"]),
-                      float(r.get("original_price") or r["price"]),
-                      int(r.get("stock", 100)), r.get("unit", "件"),
-                      r.get("specs", ""), r.get("image_url", ""), ts)
-                     for i, r in enumerate(rows, start=101)])
-                return
+                rows = json.load(f).get("products", [])
+            if not rows:
+                continue
+            conn.executemany(
+                "INSERT OR REPLACE INTO products"
+                "(id,merchant_id,name,category,price,original_price,stock,"
+                "unit,specs,image_url,status,created_at) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,'在售',?)",
+                [(r.get("id") or f"P{i:03d}", r.get("merchant_id", "M001"),
+                  r["name"], r["category"], float(r["price"]),
+                  float(r.get("original_price") or r["price"]),
+                  int(r.get("stock", 100)), r.get("unit", "件"),
+                  r.get("specs", ""), r.get("image_url", ""), ts)
+                 for i, r in enumerate(rows, start=101)])
+            return
         except (json.JSONDecodeError, KeyError, ValueError, OSError):
-            pass  # 采集文件有问题就退回演示种子，不阻塞启动
+            continue  # 采集文件有问题就试下一个 / 退回演示种子，不阻塞启动
 
     legacy = os.path.join(BASE, "data", "products_seed.json")
     if not os.path.exists(legacy):
