@@ -271,6 +271,72 @@ def test_publish_product_pending_review():
     print("  上架待审核 + 参数校验 通过")
 
 
+def test_pending_product_can_reprice_but_not_self_publish():
+    """回归（2026-10-07 审核指出）：待审核商品**改价/改库存**要放行，只有**自行上架**才拒。
+
+    之前 roles.update_product 先判 `want_on_sale and status==待审核` 再判状态是否真的变，
+    而 MCP tool 签名 `on_sale: bool = True` 默认值意味着商户只想改价也会被塞 on_sale=True，
+    于是「上架一个 → 改个价」这种最自然的操作直接被拒。
+
+    安全红线不动：商户**不能**绕过管理员审核把待审核商品翻成在售。
+    """
+    m1 = actor_for(M1_KEY)
+    pid = merchant_service.publish_product(
+        m1, "待审核改价回归品", "纸巾", 12.0, 50, "包", "")["product_id"]
+    assert q("SELECT status FROM products WHERE id=?", (pid,))[0]["status"] == roles.STATUS_PENDING
+
+    # 纯改价：放行，状态仍是待审核
+    r = merchant_service.update_product(m1, pid, price=10.9)
+    assert r.get("ok") and float(r["price"]) == 10.9, r
+    assert r["status"] == roles.STATUS_PENDING, r
+    assert float(q("SELECT price FROM products WHERE id=?", (pid,))[0]["price"]) == 10.9
+
+    # 纯改库存：放行
+    r = merchant_service.update_product(m1, pid, stock=77)
+    assert r.get("ok") and int(r["stock"]) == 77, r
+    assert r["status"] == roles.STATUS_PENDING, r
+
+    # 真正的红线：显式要把它翻成在售 → 必须拒绝
+    r = merchant_service.update_product(m1, pid, on_sale=True)
+    assert "审核" in r.get("error", ""), f"商户不能绕过审核自行上架：{r}"
+    assert q("SELECT status FROM products WHERE id=?", (pid,))[0]["status"] == roles.STATUS_PENDING
+
+    # 同一个「改价+改库存」若同时带上 on_sale=True，红线照样生效（安全侧不受影响）
+    r = merchant_service.update_product(m1, pid, price=8.8, stock=50, on_sale=True)
+    assert "审核" in r.get("error", ""), r
+    assert float(q("SELECT price FROM products WHERE id=?", (pid,))[0]["price"]) == 10.9, \
+        "被拒的调用不应有部分写入"
+
+    # 关键：走 **MCP tool 那一层**，只传 product_id + price，不传 on_sale。
+    # 这才是用户真实复现路径——之前 server.py 的 on_sale 默认 True 会替商户填上
+    # on_sale=True，导致「只想改价」被判成「想上架」而拒绝。
+    from agentmall import server as srv
+    saved = os.environ.get("AGENTMALL_API_KEY", "")
+    os.environ["AGENTMALL_API_KEY"] = M1_KEY
+    try:
+        r = srv.merchant_update_product(pid, price=6.6)
+    finally:
+        if saved:
+            os.environ["AGENTMALL_API_KEY"] = saved
+        else:
+            os.environ.pop("AGENTMALL_API_KEY", None)
+    assert r.get("ok"), f"MCP 层只改价应放行：{r}"
+    assert r["status"] == roles.STATUS_PENDING, f"状态不能被偷偷翻成在售：{r}"
+    assert float(q("SELECT price FROM products WHERE id=?", (pid,))[0]["price"]) == 6.6
+
+    # 管理员审核通过后，商户就能自由上下架了
+    admin_service.review_product(actor_for(ADMIN_KEY), pid, approve=True)
+    r = merchant_service.update_product(m1, pid, on_sale=False)
+    assert r["status"] == roles.STATUS_OFF_SHELF, r
+    r = merchant_service.update_product(m1, pid, on_sale=True)
+    assert r["status"] == roles.STATUS_ON_SALE and user_visible(pid), r
+
+    # 跨商户越权不受影响
+    r = merchant_service.update_product(actor_for(M2_KEY), pid, price=1.0)
+    assert r.get("denied") is True and "只能操作本商户" in r["error"], r
+    print("  待审核改价放行/自行上架拒绝 通过")
+
+
 def test_update_and_fulfill_flow():
     """改价/改库存/自营上下架 + 发货只允许本商户与合法状态。"""
     m2 = actor_for(M2_KEY)
@@ -447,6 +513,7 @@ TEST_ORDER = [
     "test_takedown_hides_from_user_search",
     "test_merchant_cannot_touch_other_merchant_product",
     "test_merchant_list_orders_masks_address",
+    "test_pending_product_can_reprice_but_not_self_publish",
     "test_update_and_fulfill_flow",
     "test_admin_list_merchants_and_stats",
     "test_user_role_cannot_call_admin_tools",

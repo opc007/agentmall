@@ -207,9 +207,15 @@ def merchant_publish_product(name: str, category: str, price: float,
 
 @_reg("merchant_update_product")
 def merchant_update_product(product_id: str, price: float = 0, stock: int = -1,
-                            on_sale: bool = True) -> dict:
+                            on_sale: bool = None) -> dict:
     """改价/改库存/上下架（仅本商户商品）。
-    price<=0 表示不改价；stock<0 表示不改库存。"""
+    price<=0 表示不改价；stock<0 表示不改库存；**on_sale 不传表示不改上下架**。
+
+    on_sale 的默认值必须是 None 而不是 True（2026-10-07 审核复现后修）：
+    默认 True 会让「商户只想改个价」也被当成「要把它上架」，
+    对待审核商品直接被 roles 层拒掉——而商户压根没提过上架这事。
+    None 与 False/True 可区分，才能让 roles 层判断「是不是真的在改状态」。
+    """
     actor, err = _guarded("merchant_update_product")
     if err:
         return err

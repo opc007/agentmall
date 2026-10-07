@@ -263,3 +263,6 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
   display: inline-block; animation: pulse 1.6s ease-in-out infinite;
 }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+/* 订单页 0 订单 / 有订单两态切换（轮询插单时要来回切） */
+.is-hidden { display: none !important; }

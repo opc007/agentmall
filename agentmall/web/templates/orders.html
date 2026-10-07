@@ -17,8 +17,10 @@
 </div>
 {% endif %}
 
-{% if orders %}
-<div class="table-scroll">
+{# 表格常驻：0 订单时也保留 tbody，脚本才有地方插新行。
+   之前整个表格被 {% if orders %} 包住，0 订单用户停在页面上时连脚本都不渲染，
+   智能体下了单网页也不动——正是路演第 5→6 步「让智能体下单，网页自动出现订单」。 #}
+<div class="table-scroll{% if not orders %} is-hidden{% endif %}" id="orders-table">
 <table class="table table-orders">
   <thead>
     <tr>
@@ -47,12 +49,11 @@
   </tbody>
 </table>
 </div>
-{% else %}
-<div class="empty-box">
+<div class="empty-box{% if orders %} is-hidden{% endif %}" id="orders-empty">
   <p class="empty-big">还没有订单</p>
-  <p class="muted">把 <a href="/me">个人中心</a> 的 MCP 接入点配给智能体，让它帮你建一单，订单会实时出现在这里。</p>
+  <p class="muted">把 <a href="/me">个人中心</a> 的 MCP 接入点配给智能体，让它帮你建一单，
+    <b>订单会自动出现在这里</b>（本页每 5 秒自动刷新，不用手动刷）。</p>
 </div>
-{% endif %}
 
 <div class="btn-row">
   <a class="btn btn-ghost" href="/me">← 回个人中心</a>
@@ -62,25 +63,75 @@
 
 {% block head %}
 <script>
-{% if orders %}
-// 状态实时刷新：每 5 秒拉一次 /api/orders（no-store），只改状态格和按钮，
-// 不整页 reload —— 投屏演示时不闪屏。
+// 订单实时刷新：每 5 秒拉一次 /api/orders（no-store）。
+// 两件事都做（2026-10-07 审核指出缺了第二件）：
+//   1. 刷新已有行的状态/按钮 —— 不整页 reload，投屏演示不闪屏
+//   2. **把页面上还没有的新订单插进来** —— 之前只做第 1 件，
+//      而且整个脚本还被一个 orders 条件包着：0 订单用户停在页面上时脚本都不渲染，
+//      智能体下了单网页纹丝不动 —— 正是路演第 5→6 步「让智能体下单，网页自动出现订单」
+//
+// 注意：脚本里的注释**不能出现 Jinja 标签字面量**（比如大括号+百分号开头的 if），
+// Jinja 会连 <script> 内的文本一起解析，看到就真开一个 if，然后永远等不到 endif，
+// 页面直接 500。踩过。
+// 脚本无条件渲染：0 订单时也要轮询，否则新订单永远出不来。
 var POLL_MS = 5000;
-var STATUS_TONE = {'待支付': 'badge-wait'};
+var STATUS_TONE = {'待支付': 'badge-wait', '待发货': 'badge-wait', '待收货': 'badge-wait'};
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c];
+  });
+}
 
 function paint(row, o) {
   var st = row.querySelector('.cell-status');
   var act = row.querySelector('.cell-action');
   if (st) {
-    st.innerHTML = '<span class="badge ' + (STATUS_TONE[o.status] || 'badge-done') + '">' + o.status + '</span>';
+    st.innerHTML = '<span class="badge ' + (STATUS_TONE[o.status] || 'badge-done') + '">' + esc(o.status) + '</span>';
   }
   if (act) {
     act.innerHTML = o.payable
-      ? '<a class="btn btn-sm btn-pay" href="/pay/' + o.order_id + '">去支付</a>'
+      ? '<a class="btn btn-sm btn-pay" href="/pay/' + esc(o.order_id) + '">去支付</a>'
       : '<span class="muted">—</span>';
   }
   var items = row.querySelector('.cell-items');
   if (items && o.items_brief) { items.textContent = o.items_brief; }
+}
+
+function buildRow(o) {
+  // 服务端给的是原始时间戳和 float，模板那边走的是 |dt / |money 过滤器。
+  // 这里自己格式化，保证新插入的行和首屏渲染出来的长得一样。
+  function fmtTs(v) {
+    var d = new Date(Number(v) * 1000);
+    if (isNaN(d.getTime())) return '';
+    var p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+           ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  }
+  function fmtMoney(v) {
+    var n = Number(v || 0);
+    return '¥' + n.toFixed(2);
+  }
+  var tr = document.createElement('tr');
+  tr.setAttribute('data-order-id', o.order_id);
+  tr.innerHTML =
+    '<td><code>' + esc(o.order_id) + '</code>' + (o.is_demo ? '<span class="tag-demo">演示</span>' : '') + '</td>' +
+    '<td class="cell-items">' + esc(o.items_brief) + '</td>' +
+    '<td class="muted">' + esc(o.address) + '</td>' +
+    '<td class="num">' + fmtMoney(o.total) + '</td>' +
+    '<td class="cell-status"><span class="badge ' + (STATUS_TONE[o.status] || 'badge-done') + '">' + esc(o.status) + '</span></td>' +
+    '<td class="muted">' + esc(fmtTs(o.created_at)) + '</td>' +
+    '<td class="cell-action">' + (o.payable
+        ? '<a class="btn btn-sm btn-pay" href="/pay/' + esc(o.order_id) + '">去支付</a>'
+        : '<span class="muted">—</span>') + '</td>';
+  return tr;
+}
+
+function showTable(hasAny) {
+  var t = document.getElementById('orders-table');
+  var e = document.getElementById('orders-empty');
+  if (t) t.classList.toggle('is-hidden', !hasAny);
+  if (e) e.classList.toggle('is-hidden', hasAny);
 }
 
 async function poll() {
@@ -89,22 +140,55 @@ async function poll() {
     if (!r.ok) return;
     const data = await r.json();
     if (!data.ok) return;
-    const byId = {};
+
+    var body = document.getElementById('orders-body');
+    if (body) {
+      var known = {};
+      body.querySelectorAll('tr[data-order-id]').forEach(function (row) {
+        known[row.getAttribute('data-order-id')] = 1;
+      });
+      // 新订单插到最前面（接口按时间倒序返回的，第一条就是最新的）
+      var added = 0;
+      data.orders.forEach(function (o) {
+        if (known[o.order_id]) return;
+        body.insertBefore(buildRow(o), body.firstChild);
+        known[o.order_id] = 1;
+        added++;
+      });
+      if (added) {
+        showTable(data.orders.length > 0);
+        flashNew();
+      }
+    }
+
+    // 再刷新一遍所有已知行的状态（新增的也会被覆盖，无妨）
+    var byId = {};
     data.orders.forEach(function (o) { byId[o.order_id] = o; });
     document.querySelectorAll('#orders-body tr[data-order-id]').forEach(function (row) {
-      const o = byId[row.getAttribute('data-order-id')];
+      var o = byId[row.getAttribute('data-order-id')];
       if (o) paint(row, o);
     });
-    const ts = document.getElementById('last-sync');
+
+    var ts = document.getElementById('last-sync');
     if (ts) {
-      const d = new Date();
-      const p = function (n) { return (n < 10 ? '0' : '') + n; };
+      var d = new Date();
+      var p = function (n) { return (n < 10 ? '0' : '') + n; };
       ts.textContent = '最后同步 ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
     }
   } catch (e) { /* 演示环境网络抖动忽略即可 */ }
 }
+
+// 新订单进来时闪一下，投屏时观众视线能跟过去
+function flashNew() {
+  var first = document.querySelector('#orders-body tr[data-order-id]');
+  if (!first || !first.animate) return;
+  first.animate(
+    [{background: '#fff3cd'}, {background: 'transparent'}],
+    {duration: 1800, easing: 'ease-out'}
+  );
+}
+
 poll();
 setInterval(poll, POLL_MS);
-{% endif %}
 </script>
 {% endblock %}

@@ -506,11 +506,16 @@ class MerchantService:
                     return {"error": "只能操作本商户的商品", "denied": True}
                 if on_sale is not None:
                     want_on_sale = _as_bool(on_sale)
-                    if want_on_sale and row["status"] == STATUS_PENDING:
-                        # 商户不能绕过管理员审核自行上架（Phase2任务书 §3）
-                        return {"error": "待审核商品需管理员审核通过后才能上架"}
                     target = STATUS_ON_SALE if want_on_sale else STATUS_OFF_SHELF
+                    # 先判「状态是不是真的在变」，再判要不要拦。
+                    # 2026-10-07 修：原来先拦后判，导致商户只想改个价也会被拒——
+                    # 因为 MCP tool 签名 on_sale 默认 True，不传也会塞 True 进来。
+                    # 现在 target == 当前状态时（纯改价/改库存）照常放行，
+                    # 只有**真正想把待审核商品翻成在售**才拒绝（Phase2任务书 §3 红线不动）。
                     if target != row["status"]:
+                        if want_on_sale and row["status"] == STATUS_PENDING:
+                            # 商户不能绕过管理员审核自行上架
+                            return {"error": "待审核商品需管理员审核通过后才能上架"}
                         sets.append("status=?")
                         args.append(target)
                         changes["status"] = {"from": row["status"], "to": target}
