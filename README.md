@@ -53,10 +53,26 @@ python -m agentmall.server
 
 ## 合规声明
 
-本项目一期仅实现"智能体辅助支付"：智能体生成订单后，由用户本人点击支付链接完成付款。
-不实现、不鼓励任何形式的智能体自动扣款。相关设计遵循中国支付清算协会
-《智能体支付应用自律公约》中"预设条件下自主支付需报备评估"的要求，
-真实支付能力上线前将完成合规评估与报备。
+本项目采用 **"checkout hands off"（结账交接）** 范式——这是 Anthropic 官方
+commerce-agents 蓝图确立的智能体电商安全模式，也是 northcinder
+"Buying stays a separate decision"（购买是独立决策）理念的中文落地：
+**下单是智能体的事，付钱永远是用户的事。智能体只建单，
+支付发生在用户自己的浏览器/App 里，模型碰不到钱。**
+
+一期仅实现"智能体辅助支付"，不实现、不鼓励任何形式的智能体自动扣款。
+该设计同时符合中国支付清算协会《智能体支付应用自律公约》第一阶段
+（辅助支付）的要求；真实支付能力上线前将完成合规评估与报备。
+
+## 设计参考
+
+本项目站在以下开源项目的基础上设计：
+- [anthropics/commerce-agents](https://github.com/anthropics/commerce-agents) —— "checkout hands off" 范式与 start-small 方法论
+- [cinderline/northcinder](https://github.com/cinderline/northcinder) —— human-in-the-loop 结账流程与 Adapter 货源模式
+- [jackwangfeng/keel](https://github.com/jackwangfeng/keel) —— per-agent key 分级权限与写操作提案队列
+- [shopmanagerai/shopify-mcp](https://github.com/shopmanagerai/shopify-mcp) —— CI 强制只读保证与 operation ledger
+
+差异化：以上没有一个覆盖"1688 一件代发 + 用户/商户/管理员三角色 + 中国支付合规"
+这个组合——这正是 AgentMall 的位置。
 
 ## License
 
