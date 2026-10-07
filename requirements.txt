@@ -1,0 +1,2 @@
+# AgentMall MVP 依赖
+mcp>=1.8
