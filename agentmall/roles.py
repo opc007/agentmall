@@ -47,11 +47,16 @@ PRODUCT_STATUSES = (STATUS_PENDING, STATUS_ON_SALE, STATUS_OFF_SHELF)
 ORDER_PENDING_PAY = "待支付"
 ORDER_TO_SHIP = "待发货"
 ORDER_TO_RECEIVE = "待收货"
-ORDER_DONE = "完成"
+# 终态用「已完成」：决策 1A 拍板的对外口径，也是 store.confirm_payment 实际写库的值。
+# 这里曾写成「完成」，导致三处对不上（2026-10-07 彩排时发现）：
+#   1. GMV_STATUSES 不含它 → 每一笔演示单都不计 GMV，看板 GMV 恒为 0
+#   2. merchant_list_orders(status="已完成") 被判为「未知订单状态」
+#   3. merchant_fulfill_order 对已完成的单报「状态…不允许发货」而非「订单已完成」
+ORDER_DONE = "已完成"
 ORDER_STATUSES = (ORDER_PENDING_PAY, ORDER_TO_SHIP, ORDER_TO_RECEIVE, ORDER_DONE,
                   "售后中")
 
-# GMV 口径：只算已付款且未回退的订单（待发货 / 待收货 / 完成）。
+# GMV 口径：只算已付款且未回退的订单（待发货 / 待收货 / 已完成）。
 # 待支付订单可能永远不付款，计入会虚高；售后中说明交易正在回退，暂不计入。
 GMV_STATUSES = (ORDER_TO_SHIP, ORDER_TO_RECEIVE, ORDER_DONE)
 

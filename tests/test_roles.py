@@ -348,6 +348,62 @@ def test_admin_list_merchants_and_stats():
     print("  商户列表/平台看板 通过")
 
 
+def test_demo_paid_order_counts_into_gmv():
+    """回归：走**真实**下单+支付链路，验证演示单计入 GMV（2026-10-07 彩排时发现）。
+
+    之前的 test_admin_list_merchants_and_stats 用 make_order 手工造行、状态取常量
+    roles.ORDER_DONE，所以常量写错（写成「完成」而 store 实际写「已完成」）时它照样绿，
+    真实演示单的 GMV 却一直是 0——这正是路演第 9 步「看板 GMV 增加」会当场翻车的地方。
+
+    这里刻意不复用常量，直接断言库里的字面值。
+    """
+    from agentmall.store import get_store
+    store = get_store()
+
+    admin = actor_for(ADMIN_KEY)
+    before = admin_service.stats(admin)["gmv"]
+    p = seeded_product(status=roles.STATUS_ON_SALE)
+    before_stock = int(p["stock"] if "stock" in p else 0) or None
+    stock_row = q("SELECT stock FROM products WHERE id=?", (p["id"],))[0]
+    before_stock = int(stock_row["stock"])
+
+    order = store.create_order(p["id"], 2, FULL_ADDRESS)
+    oid = order["order_id"]
+    assert order["status"] == roles.ORDER_PENDING_PAY, order
+
+    res = store.confirm_payment(oid)
+    assert res.get("paid") is True, res
+
+    # 库里的字面值必须是「已完成」（不是「完成」）
+    row = q("SELECT status,is_demo,total FROM orders WHERE id=?", (oid,))[0]
+    assert row["status"] == "已完成", f"演示单终态应为「已完成」，实际 {row['status']!r}"
+    assert int(row["is_demo"]) == 1, row
+
+    # 核心断言：这笔钱必须进 GMV
+    after = admin_service.stats(admin)["gmv"]
+    assert after == round(before + float(row["total"]), 2), \
+        f"演示单付款后 GMV 应 +{row['total']}：{before} → {after}"
+
+    # 库存确实扣了
+    after_stock = int(q("SELECT stock FROM products WHERE id=?", (p["id"],))[0]["stock"])
+    assert after_stock == before_stock - 2, (before_stock, after_stock)
+
+    # 商户按「已完成」筛订单必须能筛到（ORDER_STATUSES 认这个字面值）
+    m = actor_for(M1_KEY if p["merchant_id"] == "M001" else M2_KEY)
+    listed = merchant_service.list_orders(m, status="已完成")
+    if isinstance(listed, dict):  # 越权/错误返回
+        raise AssertionError(f"按「已完成」筛订单被拒：{listed}")
+    assert oid in {o["order_id"] for o in listed}, \
+        f"商户按「已完成」筛不到刚付完的单：{[o.get('order_id') for o in listed][:5]}"
+
+    # 对已完成的单再发货，应给「订单已完成」而不是「状态…不允许发货」
+    again = merchant_service.fulfill_order(m, oid, "SF999")
+    if isinstance(again, dict) and again.get("error"):
+        assert "已完成" in again["error"], f"报错文案不对：{again['error']}"
+
+    print("  演示单计入 GMV（真实链路）通过")
+
+
 def test_audit_log_is_append_only():
     """审计日志只读视图 + 底层禁删改触发器仍然生效（合规红线）。"""
     admin = actor_for(ADMIN_KEY)
@@ -396,6 +452,7 @@ TEST_ORDER = [
     "test_user_role_cannot_call_admin_tools",
     "test_audit_log_is_append_only",
     "test_restart_persistence_and_role_matrix",
+    "test_demo_paid_order_counts_into_gmv",
 ]
 
 

@@ -2,7 +2,7 @@
 # AgentMall 一键起全栈（路演用）。
 #
 #   ./scripts/start_demo.sh          起 3 个服务，前台等待 Ctrl-C 退出
-#   ./scripts/start_demo.sh --check  起完自动跑六套测试再退出
+#   ./scripts/start_demo.sh --check  起完自动跑七套测试 + 路演彩排再退出
 #
 # 三个服务：
 #   :8000  用户面 Web   —— 注册/登录/个人中心/订单列表/模拟收银台
@@ -81,18 +81,32 @@ cat <<BANNER
 BANNER
 
 if [ "${1:-}" = "--check" ]; then
-  echo "▶ 跑六套测试…"
+  echo "▶ 跑七套测试…"
   FAILED=0
-  for t in test_readonly demo_chain test_roles test_http_auth test_roadshow test_admin_console; do
+  for t in test_readonly demo_chain test_roles test_http_auth test_roadshow test_admin_console test_sourcing; do
     printf "  %-20s " "$t"
     if out="$("$PY" "tests/$t.py" 2>&1)"; then
-      echo "$out" | grep -oE "PASSED.*|链路 [0-9]+/[0-9]+ 项通过|鉴权 [0-9]+/[0-9]+ 项通过|管理后台 [0-9]+/[0-9]+ 项通过" | tail -1
+      echo "$out" | grep -oE "PASSED.*|链路 [0-9]+/[0-9]+ 项通过|鉴权 [0-9]+/[0-9]+ 项通过|管理后台 [0-9]+/[0-9]+ 项通过|适配层 [0-9]+/[0-9]+ 项通过|[0-9]+/[0-9]+ 项通过" | tail -1
     else
       FAILED=1
       echo "❌ 失败"
       echo "$out" | tail -20
     fi
   done
+
+  # 最后一道闸门：拿刚起的这套服务真跑一遍路演 9 步。
+  # 单测全绿不等于台上能演——2026-10-07 就是彩排时才发现看板 GMV 恒为 0。
+  echo ""
+  echo "▶ 路演彩排（对着刚起的这套服务跑 9 步）…"
+  if "$PY" scripts/rehearse.py >/tmp/agentmall_rehearse.log 2>&1; then
+    grep -E "^  ✅ 第 9 步|9 步全通" /tmp/agentmall_rehearse.log | sed 's/^/  /'
+  else
+    FAILED=1
+    echo "  ❌ 彩排没过——上台前必须先看这个："
+    grep -E "^  (✅|❌|⏭) 第|^  第 [0-9]+ 步：|^    " /tmp/agentmall_rehearse.log | sed 's/^/  /' | tail -30
+  fi
+  echo ""
+  echo "完整彩排（含每步话术）：/tmp/agentmall_rehearse.log"
   exit $FAILED
 fi
 
