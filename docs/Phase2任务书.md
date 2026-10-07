@@ -82,7 +82,11 @@ products(id, merchant_id, name, category, price, stock, unit, specs,
 merchants(id, name, api_key, created_at)
 admin_keys(id, name, api_key, created_at)
 orders(id, items_json, total, address, status, pay_url, created_at)
-         -- status: 待支付 / 待发货 / 待收货 / 完成 / 售后中
+         -- status: 待支付 / 待发货 / 待收货 / 已完成 / 售后中
+         -- 终态是「已完成」不是「完成」：决策 1A 定的对外口径，
+         -- 也是 store.confirm_payment 实际写库的字面值。
+         -- 这里原写作「完成」，与代码对不上，导致演示单不进 GMV
+         -- （2026-10-07 修，见 agentmall/roles.py ORDER_DONE）
 audit_log(id, actor_role, actor_id, action, target, detail, created_at)
 ```
 
