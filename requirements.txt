@@ -1,7 +1,14 @@
-# AgentMall MVP 依赖
-#
+# AgentMall 依赖（Phase 2）
+
 # 必须锁 mcp<2：mcp 2.x 把 FastMCP 更名为 MCPServer（mcp.server.fastmcp 直接
 # ImportError），server.py 是按 v1 FastMCP API 写的（任务书 §2 选型）。
 # 放开 >=1.8 会装到 2.x，导致 `python -m agentmall.server` 无法启动。
-# 迁 v2 属 Phase 2 事项，届时同步改 server.py 与本行。
+# 迁 v2 属 Phase 3 事项，届时同步改 server.py 与本行。
 mcp>=1.8,<2
+
+# Phase 2：Web 前端 + streamable-http MCP 入口 + 模拟支付二维码
+fastapi>=0.110
+uvicorn[standard]>=0.27
+jinja2>=3.1
+python-multipart>=0.0.9   # FastAPI 表单提交
+qrcode>=7.4               # 演示收银台二维码（不含敏感信息）
