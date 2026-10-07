@@ -12,7 +12,7 @@ store = get_store()
 
 @mcp.tool()
 def search_products(keyword: str, category: str = "", max_price: float = 0,
-                    limit: int = 10) -> list:
+                    limit: int = 10) -> list[dict]:
     """搜索日用商品，按价格升序返回。
     keyword: 关键词，如"纸巾"；category: 纸巾/垃圾袋/清洁/收纳/个护，空=不限；
     max_price: 最高价，0=不限；limit: 最多返回条数。"""

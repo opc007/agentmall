@@ -1,2 +1,7 @@
 # AgentMall MVP 依赖
-mcp>=1.8
+#
+# 必须锁 mcp<2：mcp 2.x 把 FastMCP 更名为 MCPServer（mcp.server.fastmcp 直接
+# ImportError），server.py 是按 v1 FastMCP API 写的（任务书 §2 选型）。
+# 放开 >=1.8 会装到 2.x，导致 `python -m agentmall.server` 无法启动。
+# 迁 v2 属 Phase 2 事项，届时同步改 server.py 与本行。
+mcp>=1.8,<2
