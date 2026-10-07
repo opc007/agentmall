@@ -541,7 +541,14 @@ class MerchantService:
                     "ORDER BY created_at DESC, id DESC", (mid,)).fetchall()
         except Exception as exc:
             return [{"error": f"查询商品失败：{exc}"}]
-        return [dict(r) for r in rows]
+        # 补 product_id 别名：publish_product 返回的是 product_id，
+        # 列表里只有 id 的话调用方拼不出来（与订单 order_id 同样的处理）
+        out = []
+        for r in rows:
+            d = dict(r)
+            d["product_id"] = d.get("id", "")
+            out.append(d)
+        return out
 
     # ---- 订单 ----
 
