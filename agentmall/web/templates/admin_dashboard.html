@@ -25,9 +25,9 @@
   <table><tr><th>商品</th><th>品类</th><th>定价</th><th>商户</th><th>操作</th></tr>
   {% for p in pending %}
   <tr><td>{{ p.name }}</td><td>{{ p.category }}</td><td>¥{{ p.price }}</td><td>{{ p.merchant_id }}</td>
-  <td><form class="inline" method="post" action="/products/{{ p.id }}/review">
+  <td><form class="inline" method="post" action="{{ base }}/products/{{ p.id }}/review">
     <input type="hidden" name="approve" value="1"><button type="submit">通过</button></form>
-    <form class="inline" method="post" action="/products/{{ p.id }}/review">
+    <form class="inline" method="post" action="{{ base }}/products/{{ p.id }}/review">
     <input type="hidden" name="approve" value="0"><input name="reason" placeholder="驳回原因" required>
     <button class="danger" type="submit">驳回</button></form></td></tr>
   {% else %}<tr><td colspan="5" class="muted">暂无待审核商品</td></tr>{% endfor %}

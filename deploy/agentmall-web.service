@@ -1,0 +1,81 @@
+# ============================================================
+# AgentMall 用户面 Web（FastAPI，:8000）
+#
+# 部署：
+#   sudo cp deploy/agentmall-web.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now agentmall-web
+#   sudo systemctl status agentmall-web && journalctl -u agentmall-web -f
+#
+# ⚠️ 为什么 ExecStart 用 `uvicorn agentmall.web.app:app` 而不是 `python -m agentmall.web.app`：
+#    agentmall/web/app.py 全文没有 `if __name__ == "__main__"` 块，直接 -m 跑
+#    会**立刻退出且退出码 0**；配合 Restart=always 就是无限静默重启，
+#    systemctl status 显示 active 但页面 502，最难查的一类故障。
+#    （http_server.py / admin_app.py 有 main()，那两可以 -m 起。）
+#
+# ⚠️ 端口来自命令行 --port，不是环境变量：全仓只有 scripts/start_demo.sh 读
+#    AGENTMALL_WEB_PORT，agentmall/web/app.py 不读它（已 grep 确认）。
+#    EnvironmentFile 里那个 AGENTMALL_WEB_PORT 目前是空转的，写它只为将来兼容。
+# ============================================================
+[Unit]
+Description=AgentMall Web (user-facing, :8000)
+Documentation=https://github.com/your-org/agentmall
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=agentmall
+Group=agentmall
+WorkingDirectory=/opt/agentmall
+
+# 集中管理全部环境变量（DB 路径 / 端口 / 公网 URL）。
+# 文件权限必须是 600 且属主 root:root：里面有公网域名，别让普通用户可读。
+EnvironmentFile=/etc/agentmall/agentmall.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+ExecStart=/opt/agentmall/.venv/bin/python -m uvicorn agentmall.web.app:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --proxy-headers \
+    --forwarded-allow-ips=127.0.0.1
+
+Restart=always
+RestartSec=3
+# 崩溃循环兜底：10s 内起 5 次就放弃，避免配置写错时把机器刷爆日志
+StartLimitIntervalSec=60
+StartLimitBurst=5
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=agentmall-web
+
+# ---- SQLite 属主与权限 ----
+# 0077 → 建出来的 agentmall.db 是 0600、-wal/-shm 同级不可读，
+# 里面存着用户口令哈希和全部 API key，别给成 0644。
+UMask=0077
+
+# ---- 基础加固（不影响运行）----
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictNamespaces=true
+# /var/lib/agentmall 是 SQLite 唯一需要写的地方（AGENTMALL_DB 指到这里）
+ReadWritePaths=/var/lib/agentmall
+# 起不来时先看 journalctl 的 errno；如果是 EPERM，多半是这行拦了某个系统调用，
+# 删掉它即可，不要直接整体关掉加固。
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

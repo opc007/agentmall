@@ -2,14 +2,14 @@
 {% block title %}商品治理{% endblock %}
 {% block content %}
 <h2>🏷️ 商品治理（下架 / 审核）</h2>
-<p class="muted">下架与审核均记入审计日志（<a href="/audit">查看</a>），reason 必填。</p>
+<p class="muted">下架与审核均记入审计日志（<a href="{{ base }}/audit">查看</a>），reason 必填。</p>
 <div class="card">
 <table><tr><th>ID</th><th>商品</th><th>品类</th><th>售价</th><th>库存</th><th>商户</th><th>状态</th><th>操作</th></tr>
 {% for p in products %}
 <tr><td>{{ p.id }}</td><td>{{ p.name }}</td><td>{{ p.category }}</td><td>¥{{ p.price }}</td>
 <td>{{ p.stock }}</td><td>{{ p.merchant_id }}</td>
 <td><span class="badge s-{{ p.status }}">{{ p.status }}</span></td>
-<td><form class="inline" method="post" action="/products/{{ p.id }}/takedown">
+<td><form class="inline" method="post" action="{{ base }}/products/{{ p.id }}/takedown">
   <input name="reason" placeholder="下架原因（必填）" required><button class="danger" type="submit">下架</button>
 </form></td></tr>
 {% else %}<tr><td colspan="8" class="muted">暂无商品</td></tr>{% endfor %}

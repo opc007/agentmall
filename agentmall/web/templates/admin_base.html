@@ -49,12 +49,12 @@ form.inline{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 <header>
   <h1>🛡️ AgentMall 管理后台</h1>
   <nav>
-    <a href="/" class="{{ 'on' if nav=='dash' }}">看板</a>
-    <a href="/orders" class="{{ 'on' if nav=='orders' }}">全平台订单</a>
-    <a href="/products" class="{{ 'on' if nav=='products' }}">商品治理</a>
-    <a href="/audit" class="{{ 'on' if nav=='audit' }}">审计日志</a>
+    <a href="{{ base }}/" class="{{ 'on' if nav=='dash' }}">看板</a>
+    <a href="{{ base }}/orders" class="{{ 'on' if nav=='orders' }}">全平台订单</a>
+    <a href="{{ base }}/products" class="{{ 'on' if nav=='products' }}">商品治理</a>
+    <a href="{{ base }}/audit" class="{{ 'on' if nav=='audit' }}">审计日志</a>
   </nav>
-  <form method="post" action="/logout"><button type="submit">退出</button></form>
+  <form method="post" action="{{ base }}/logout"><button type="submit">退出</button></form>
 </header>
 <main>
   {% if msg %}<div class="msg {{ level }}">{{ msg }}</div>{% endif %}

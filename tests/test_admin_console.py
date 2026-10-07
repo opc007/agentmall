@@ -6,6 +6,7 @@
 运行： .venv/bin/python tests/test_admin_console.py
 """
 import http.cookiejar
+import re
 import os
 import socket
 import subprocess
@@ -72,6 +73,60 @@ def wait_up(url, proc, tries=80):
                 return False
             time.sleep(0.5)
     return False
+
+
+def test_admin_base_path():
+    """管理后台挂到 /admin 前缀下时，内部链接必须带前缀。
+
+    背景：用户面与管理后台**共用 /orders、/login、/logout 这些路由名**。
+    nginx 的 `proxy_pass http://.../` 会把 /admin 前缀剥掉再转发，
+    若应用仍生成根绝对链接，后台点「订单」就会跳到**买家的订单页**。
+    回归风险高，这里单独锁死。
+    """
+    port = free_ports(1)[0]
+    base = f"http://127.0.0.1:{port}"
+    db_path = os.path.join(tempfile.gettempdir(), "agentmall_test_admin_bp.db")
+    for sfx in ("", "-wal", "-shm"):
+        if os.path.exists(db_path + sfx):
+            os.remove(db_path + sfx)
+    env = dict(os.environ, AGENTMALL_DB=db_path, PYTHONPATH=ROOT,
+               AGENTMALL_ADMIN_BASE_PATH="/admin")
+    proc = subprocess.Popen(
+        [sys.executable, "-m", "uvicorn", "agentmall.web.admin_app:app",
+         "--port", str(port)], cwd=ROOT, env=env,
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        if not wait_up(f"{base}/healthz", proc):
+            check(False, "带前缀的管理后台启动成功")
+            return
+        # 模拟 nginx 剥掉前缀后转发：应用收到的是根路径 /
+        c = C(base)
+        st, body, url = c.go("/")
+        check(url.endswith("/admin/login"),
+              f"未登录重定向到带前缀的登录页（{url}）")
+        c2 = C(base)
+        st, body, url = c2.go("/login", {"key": ADMIN_KEY})
+        check(url.endswith("/admin/"), f"登录后回到带前缀的首页（{url}）")
+        st, body, _ = c2.go("/")
+        links = set(re.findall(r'(?:href|action)="([^"]*)"', body))
+        admin_links = [l for l in links if l.startswith("/")]
+        check(admin_links and all(l.startswith("/admin/") for l in admin_links),
+              f"后台链接全部带 /admin 前缀（{sorted(admin_links)}）")
+        check("admin/admin" not in body, "无双前缀（不会与 nginx sub_filter 叠加炸掉）")
+        st, body, _ = c2.go("/orders")
+        check(st == 200 and "全平台订单" in body, "带前缀下订单页仍可打开")
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+        for sfx in ("", "-wal", "-shm"):
+            if os.path.exists(db_path + sfx):
+                try:
+                    os.remove(db_path + sfx)
+                except OSError:
+                    pass
 
 
 def main() -> int:
@@ -153,6 +208,8 @@ def main() -> int:
         logs = admin_service.audit_log(admin_actor, 50)
         check(any("takedown" in str(l.get("action", "")) for l in logs),
               f"audit_log 里有下架记录（共 {len(logs)} 条）")
+
+        test_admin_base_path()
 
         # 10. 审计表禁删改（合规红线）
         from agentmall import db

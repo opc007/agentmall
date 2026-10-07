@@ -3,7 +3,7 @@
 {% block content %}
 <h2>🧾 全平台订单</h2>
 <div class="card">
-<form class="inline" method="get" action="/orders">
+<form class="inline" method="get" action="{{ base }}/orders">
   <span class="muted">按状态筛选：</span>
   <select name="status">
     <option value="">全部</option>

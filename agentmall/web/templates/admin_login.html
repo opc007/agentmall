@@ -17,7 +17,7 @@ code{color:#6ee7a0}
   <h1>🛡️ 管理后台登录</h1>
   <p class="sub">输入管理员 API key 进入平台管理视角</p>
   {% if msg %}<div class="err">{{ msg }}</div>{% endif %}
-  <form method="post" action="/login">
+  <form method="post" action="{{ base }}/login">
     <input name="key" placeholder="管理员 API key" required autofocus>
     <button type="submit">进入管理后台</button>
   </form>

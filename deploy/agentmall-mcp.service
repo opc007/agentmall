@@ -1,0 +1,80 @@
+# ============================================================
+# AgentMall MCP Server（streamable-http，:8001/mcp）
+#
+# 部署：
+#   sudo cp deploy/agentmall-mcp.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now agentmall-mcp
+#   curl -s localhost:8001/healthz
+#     → {"ok":true,"service":"agentmall-mcp","path":"/mcp"}
+#   curl -s localhost:8001/whoami -H 'Authorization: Bearer <你的 key>'
+#     → 确认 key 被解析成什么角色（user / merchant / admin）
+#
+# ⚠️ 绑定地址：agentmall/http_server.py 的 main() 里写死 host="0.0.0.0"，
+#    没有命令行参数可改（本文件不改任何 Python 代码）。
+#    所以 8001 一定会监听所有网卡，**必须**靠防火墙/安全组只放行 80/443，
+#    以及只允许内网或固定 IP 直连 8001。
+#    想要真正绑 127.0.0.1，改用下面注释掉的 uvicorn 写法（代价：
+#    端口改由命令行给，AGENTMALL_MCP_PORT 就不再被读取了）。
+#
+# ⚠️ 必须挂在 nginx 后面（见 deploy/nginx.conf 的 /mcp 段）：
+#    直连 8001 会撞上 nginx 默认 60s 的 proxy_read_timeout，
+#    SSE 长连接必被掐断，表现为「智能体一开始能连上，过几十秒就断」。
+# ============================================================
+[Unit]
+Description=AgentMall MCP Server (streamable-http, :8001/mcp)
+Documentation=https://github.com/your-org/agentmall
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=agentmall
+Group=agentmall
+WorkingDirectory=/opt/agentmall
+
+EnvironmentFile=/etc/agentmall/agentmall.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+# 多角色：单进程同时注册 user/merchant/admin 三套 tool。
+# http_server.py 内部已 setdefault("AGENTMALL_MULTI_ROLE","1")，这里显式声明
+# 是为了在 systemctl show / ps e 里一眼能看到；写成 "1" 才是生效值。
+Environment=AGENTMALL_MULTI_ROLE=1
+
+# 端口由 AGENTMALL_MCP_PORT 决定（http_server.py 真读这个变量，默认 8001）
+ExecStart=/opt/agentmall/.venv/bin/python -m agentmall.http_server
+
+# 备选写法（想绑 127.0.0.1 时启用，并把上面 ExecStart 注释掉）：
+#   /opt/agentmall/.venv/bin/python -m uvicorn agentmall.http_server:app \
+#       --host 127.0.0.1 --port 8001 --proxy-headers --forwarded-allow-ips=127.0.0.1
+
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=60
+StartLimitBurst=5
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=agentmall-mcp
+
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictNamespaces=true
+ReadWritePaths=/var/lib/agentmall
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

@@ -27,6 +27,17 @@ TPL = Path(__file__).parent / "templates"
 templates = Jinja2Templates(directory=str(TPL))
 DEMO_ADMIN_KEY = "ak_demo_admin_secret"
 
+# 挂在 nginx 的 /admin 前缀下时必须设成 "/admin"，否则后台内部链接会撞到
+# 用户面同名路由（/orders、/logout、/login 都是共用的）——点后台「订单」
+# 会跳到买家的订单页，未登录会跳到买家登录页。
+# 独立端口裸跑（:8002）时留空即可。
+BASE_PATH = os.environ.get("AGENTMALL_ADMIN_BASE_PATH", "").rstrip("/")
+
+
+def _u(path: str) -> str:
+    """把站内路径加上 BASE_PATH 前缀。"""
+    return f"{BASE_PATH}{path if path.startswith('/') else '/' + path}"
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -49,7 +60,7 @@ def _actor(request: Request) -> dict | None:
 def _guard(request: Request):
     """未登录或非管理员 → 重定向到登录页。"""
     if _actor(request) is None:
-        return RedirectResponse("/login", status_code=303)
+        return RedirectResponse(_u("/login"), status_code=303)
     return None
 
 
@@ -125,17 +136,17 @@ async def login_page(request: Request, msg: str = "", level: str = "err"):
 async def login(request: Request, key: str = Form(...)):
     actor = auth.resolve_key(key.strip())
     if not actor or actor["role"] != auth.ROLE_ADMIN:
-        return RedirectResponse(
-            f"/login?msg={'不是管理员 key' if actor else 'key 无效'}&level=err",
-            status_code=303)
-    resp = RedirectResponse("/", status_code=303)
+        from urllib.parse import quote
+        msg = quote("不是管理员 key" if actor else "key 无效")
+        return RedirectResponse(_u(f"/login?msg={msg}&level=err"), status_code=303)
+    resp = RedirectResponse(_u("/"), status_code=303)
     resp.set_cookie(ADMIN_KEY_COOKIE, key.strip(), httponly=True, samesite="lax")
     return resp
 
 
 @app.post("/logout")
 async def logout():
-    resp = RedirectResponse("/login", status_code=303)
+    resp = RedirectResponse(_u("/login"), status_code=303)
     resp.delete_cookie(ADMIN_KEY_COOKIE)
     return resp
 
@@ -147,6 +158,7 @@ async def dashboard(request: Request):
     actor = _actor(request)
     stats = admin_service.stats(actor)
     return templates.TemplateResponse(request, "admin_dashboard.html", {
+        "base": BASE_PATH,
 "actor": actor, "stats": stats,
         "orders": list_platform_orders(limit=20),
         "pending": [p for p in list_products_for_admin() if p["status"] == "待审核"][:20],
@@ -159,6 +171,7 @@ async def orders_page(request: Request, status: str = ""):
     if (g := _guard(request)):
         return g
     return templates.TemplateResponse(request, "admin_orders.html", {
+        "base": BASE_PATH,
 "actor": _actor(request),
         "orders": list_platform_orders(status=status), "status": status,
         **_flash(request, request.query_params.get("msg", ""),
@@ -170,6 +183,7 @@ async def products_page(request: Request):
     if (g := _guard(request)):
         return g
     return templates.TemplateResponse(request, "admin_products.html", {
+        "base": BASE_PATH,
 "actor": _actor(request),
         "products": list_products_for_admin(),
         **_flash(request, request.query_params.get("msg", ""),
@@ -182,6 +196,7 @@ async def audit_page(request: Request, limit: int = 100):
         return g
     logs = admin_service.audit_log(_actor(request), limit)
     return templates.TemplateResponse(request, "admin_audit.html", {
+        "base": BASE_PATH,
 "actor": _actor(request), "logs": logs,
         **_flash(request, request.query_params.get("msg", ""),
                  request.query_params.get("level", "ok"))})
@@ -193,9 +208,10 @@ async def takedown(request: Request, product_id: str, reason: str = Form("")):
         return g
     res = admin_service.takedown_product(_actor(request), product_id, reason)
     ok = "error" not in res
-    return RedirectResponse(
-        f"/products?msg={'已下架 ' + product_id if ok else res['error']}"
-        f"&level={'ok' if ok else 'err'}", status_code=303)
+    from urllib.parse import quote
+    msg = quote("已下架 " + product_id if ok else res["error"])
+    return RedirectResponse(_u(f"/products?msg={msg}&level={'ok' if ok else 'err'}"),
+                            status_code=303)
 
 
 @app.post("/products/{product_id}/review")
@@ -205,9 +221,10 @@ async def review(request: Request, product_id: str, approve: str = Form("")):
     res = admin_service.review_product(
         _actor(request), product_id, approve == "1", request.query_params.get("reason", ""))
     ok = "error" not in res
-    return RedirectResponse(
-        f"/products?msg={'已通过 ' + product_id if ok else res['error']}"
-        f"&level={'ok' if ok else 'err'}", status_code=303)
+    from urllib.parse import quote
+    msg = quote("已通过 " + product_id if ok else res["error"])
+    return RedirectResponse(_u(f"/products?msg={msg}&level={'ok' if ok else 'err'}"),
+                            status_code=303)
 
 
 def main() -> None:  # pragma: no cover

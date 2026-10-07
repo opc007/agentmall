@@ -1,0 +1,72 @@
+# ============================================================
+# Docker 构建上下文排除表
+# 目标：构建上下文越小越快，且**绝不把本地运行时产物/密钥打进镜像**。
+# 规则语义同 .gitignore：含斜杠的 pattern 相对**上下文根**锚定，
+# 所以 `data/*.json` 只匹配根目录 data/，不会误伤 agentmall/data/。
+# ============================================================
+
+# ---- 版本控制 / 编辑器 ----
+.git
+.gitignore
+.gitattributes
+.idea
+.vscode
+*.swp
+*~
+
+# ---- 本地虚拟环境与构建产物（绝不能进镜像，否则会覆盖镜像里 pip 装的依赖）----
+.venv
+venv
+env
+.build
+dist
+build
+*.egg-info
+
+# ---- Python 缓存 ----
+__pycache__
+**/__pycache__
+*.py[cod]
+*.egg
+
+# ---- SQLite 运行时数据：本地演示库绝不能进镜像（.gitignore 里同样排除）----
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+data/*.db
+agentmall/data/*.db
+
+# ---- 密钥：.env 只留 .env.example 之外的都不进 ----
+.env
+.env.*
+*.pem
+*.key
+*.crt
+deploy/*.local.conf
+
+# ---- 测试与临时产物 ----
+# 注意写 `tests` 而不是 `tests/`：带结尾斜杠是 git 风格，
+# Docker 的匹配按路径串做，带斜杠容易只匹配到目录名而漏掉目录内文件。
+tests
+.pytest_cache
+.mypy_cache
+.ruff_cache
+htmlcov
+.coverage
+demo/*.log
+tmp/
+
+# ---- data/ 下的抓取中间产物 ----
+# ⚠️ 但 data/products_real.json **必须保留**（下一行显式反选）：
+#    db._seed_products() 第一优先读 <repo_root>/data/products_real.json 灌演示商品，
+#    缺文件会静默退回 30 条老种子，演示效果直接打折。
+data/*.json
+!data/products_real.json
+
+# ---- 文档/剧本：镜像运行不需要，但演示时方便 cat。
+#      保持注释状态；想瘦身就打开。
+# docs/
+# demo/
+# scripts/

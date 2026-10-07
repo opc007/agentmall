@@ -1,0 +1,72 @@
+# ============================================================
+# AgentMall 管理后台（FastAPI，:8002）
+#
+# 部署：
+#   sudo cp deploy/agentmall-admin.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now agentmall-admin
+#   curl -s localhost:8002/healthz
+#     → {"ok":true,"service":"agentmall-admin"}
+#
+# ⚠️ 安全第一：这是管理面，能看全平台订单、审核/下架商品、翻审计日志。
+#    它目前的登录形态是「登录页填管理员 key → key 存 cookie」，
+#    默认 key 是硬编码在代码里的演示值，登录页还会直接回显这个 demo 值。
+#    **在补独立账号体系之前，公网入口必须由 nginx 的 auth_basic 兜住**
+#    （见 deploy/nginx.conf 的 /admin 段），并且防火墙不放行 8002。
+#
+# ⚠️ 绑定地址：admin_app.py 的 main() 写死 host="0.0.0.0"，改不掉，
+#    同 MCP 一样只能靠防火墙兜。想绑 127.0.0.1 用下面注释里的 uvicorn 写法。
+# ============================================================
+[Unit]
+Description=AgentMall Admin Console (:8002)
+Documentation=https://github.com/your-org/agentmall
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=agentmall
+Group=agentmall
+WorkingDirectory=/opt/agentmall
+
+EnvironmentFile=/etc/agentmall/agentmall.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+# 端口由 AGENTMALL_ADMIN_PORT 决定（admin_app.py 真读这个变量，默认 8002）
+ExecStart=/opt/agentmall/.venv/bin/python -m agentmall.web.admin_app
+
+# 备选写法（想绑 127.0.0.1 时启用，并把上面 ExecStart 注释掉）：
+#   /opt/agentmall/.venv/bin/python -m uvicorn agentmall.web.admin_app:app \
+#       --host 127.0.0.1 --port 8002 --proxy-headers --forwarded-allow-ips=127.0.0.1
+
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=60
+StartLimitBurst=5
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=agentmall-admin
+
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictNamespaces=true
+ReadWritePaths=/var/lib/agentmall
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

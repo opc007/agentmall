@@ -1,0 +1,137 @@
+# ============================================================
+# AgentMall 三服务编排：web(8000) / mcp(8001) / admin(8002)
+#
+#   docker compose up -d --build
+#   docker compose ps && curl -s localhost:8000/healthz
+#   docker compose down          # 停；数据在宿主 ./data，不会丢
+#
+# 三个 service 共用同一个镜像，只靠 command / environment 区分。
+# ============================================================
+
+# 演示环境：支付为 Mock 模拟网关，不接任何真实支付通道；商品为演示数据。
+x-agentmall-common: &agentmall-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: agentmall:latest
+  restart: unless-stopped
+  # PID 1 信号转发：uvicorn 收到 SIGTERM 才能优雅退出；
+  # 不开的话 docker stop 会等 10 秒然后 SIGKILL，长连接请求会被腰斩。
+  init: true
+
+  # ---- 关键：三个进程挂**同一个** SQLite 目录 ----
+  # db.py 用的是单个 SQLite 文件（AGENTMALL_DB），三个进程同时读写，
+  # 靠 WAL + busy_timeout 串行化。**容器必须看到同一个文件**，
+  # 否则各服务各建各的库：用户面看不到管理后台的订单，反之亦然。
+  #
+  # 为什么用 bind mount（宿主 ./data）而不是 named volume：
+  #   1. 宿主机能直接 sqlite3 ./data/agentmall.db ".tables" 查数据、排障不用 docker exec；
+  #   2. 备份 = cp/定时任务直接拷宿主目录，不用 `docker run --volumes-from`；
+  #   3. 数据生命周期与容器解耦，`docker compose down` / 换镜像都不影响；
+  #   4. 方便 rsync 到异地、或直接丢进对象存储。
+  # 代价：宿主目录属主必须和容器内 agentmall(uid 10001) 对上，否则建库直接
+  #       "unable to open database file"。首次上线前执行：
+  #         mkdir -p ./data && sudo chown -R 10001:10001 ./data
+  # 挂的是**目录**不是单个 .db 文件：WAL 模式会在同目录生成
+  # agentmall.db-wal / -shm 两个文件，只挂文件的话这两个文件会落到容器可写层，
+  # 容器一重建就没了，且锁协调会出玄学问题。
+  volumes:
+    - ./data:/data
+
+  environment: &agentmall-env
+    # SQLite 落点 → 上面挂载的 ./data
+    AGENTMALL_DB: /data/agentmall.db
+    # 支付收银台链接的对外 base URL：**上线必须改成真实公网域名**。
+    # 不设的话默认 http://127.0.0.1:8000，用户拿到手的订单 pay_url 打不开。
+    # 只在用户面用得到，但三份都带上（省得漏），nginx 统一 443 收口。
+    AGENTMALL_PUBLIC_URL: ${AGENTMALL_PUBLIC_URL:?必须在 .env 里设置真实的公网域名，例如 https://mall.example.com}
+    # ⚠️ AGENTMALL_PUBLIC_URL 只在用户面真正用到（payment.py），这里三份都带上只为省心。
+    # ⚠️ AGENTMALL_WEB_PORT **刻意不放进这个公共锚点**：它是空转变量（全仓只有
+    #    scripts/start_demo.sh 读它，agentmall/web/app.py 不读），只有 web 服务需要它。
+    #    用户面端口实际由下面 command 的 --port 决定。放在 web 服务里单写，
+    #    是为将来 app.py 补上读取逻辑后行为一致，届时不用改部署物料。
+
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  # ---------------------------------------------------------------- 用户面
+  web:
+    <<: *agentmall-common
+    container_name: agentmall-web
+    command: >
+      python -m uvicorn agentmall.web.app:app
+      --host 0.0.0.0 --port 8000
+      --proxy-headers --forwarded-allow-ips=*
+    environment:
+      <<: *agentmall-env
+      # 空转变量，仅为将来兼容；真实端口在上面的 --port 8000
+      AGENTMALL_WEB_PORT: "8000"
+    ports:
+      # 默认**不**对外暴露 8000：公网流量统一走 nginx(80/443)，
+      # 8000 直连会把 nginx 上的安全响应头、basic auth、SSE 长连接配置全绕过去。
+      # 需要本机调试就临时用：docker compose run --service-ports web
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=4).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # ---------------------------------------------------------------- MCP
+  mcp:
+    <<: *agentmall-common
+    container_name: agentmall-mcp
+    # streamable-http 入口（AI 客户端按「URL + Bearer key」接入，不是 stdio）
+    command: ["python", "-m", "agentmall.http_server"]
+    environment:
+      <<: *agentmall-env
+      # 真被读：http_server.py `PORT = int(os.environ.get("AGENTMALL_MCP_PORT", "8001"))`
+      AGENTMALL_MCP_PORT: "8001"
+      # 多角色：单进程同时注册 user/merchant/admin 三套 tool，隔离靠调用时守卫 + 审计兜底。
+      # http_server.py 内部已 os.environ.setdefault("AGENTMALL_MULTI_ROLE", "1")，
+      # 这里显式写出来是为了「看配置的人一眼看到」，也防止将来默认值被改。
+      AGENTMALL_MULTI_ROLE: "1"
+    ports:
+      # 只绑回环：MCP 走公网必须经过 nginx（关 proxy_buffering + 长 read_timeout），
+      # 直连 8001 会让 SSE 长连接在默认 60s read timeout 上被砍断。
+      - "127.0.0.1:8001:8001"
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8001/healthz', timeout=4).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # ---------------------------------------------------------------- 管理后台
+  admin:
+    <<: *agentmall-common
+    container_name: agentmall-admin
+    command: >
+      python -m agentmall.web.admin_app
+    environment:
+      <<: *agentmall-env
+      AGENTMALL_ADMIN_PORT: "8002"
+      # ⚠️ 必须设：nginx 的 `proxy_pass http://.../ ` 尾斜杠会把 /admin/ 前缀剥掉再转发，
+      # 应用收到的是根路径 /orders、/logout。设了这个变量，后台**自己生成**带 /admin
+      # 前缀的链接，点导航才不会跳到用户面的同名路由（用户面同样有 /orders、/login，
+      # 不设就是"后台一点跳到买家页面"）。详见 deploy/nginx.conf 的 /admin 注释。
+      # 核对：curl 后台首页，grep 出的 href 应当全是 /admin/ 开头。
+      AGENTMALL_ADMIN_BASE_PATH: "/admin"
+    ports:
+      # 管理后台**只绑回环**，公网访问一律经 nginx:8443 -> 反代 /admin，
+      # 那里有 auth_basic 兜底。没有独立登录体系之前，不裸奔公网。
+      - "127.0.0.1:8002:8002"
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8002/healthz', timeout=4).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
