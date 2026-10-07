@@ -8,7 +8,7 @@
 **顺序很重要**：先验，后清。
 
 ```bash
-./scripts/start_demo.sh --check  # ① 七套测试 + 拿这套服务真跑一遍下面 9 步
+./scripts/start_demo.sh --check  # ① 八套测试 + 拿这套服务真跑一遍下面 9 步
 ./scripts/reset_demo.sh          # ② 验完把演示库清回刚 seed 完的样子（自动备份到 /tmp）
 ./scripts/start_demo.sh          # ③ 重新起服务，正式开演
 ```
