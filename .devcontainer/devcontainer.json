@@ -1,0 +1,10 @@
+{
+  "name": "AgentMall \u8def\u6f14\u73af\u5883",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "postCreateCommand": "pip install -r requirements.txt",
+  "portsAttributes": {
+    "8000": { "label": "\u7528\u6237\u9762 Web", "visibility": "public", "onAutoForward": "notify" },
+    "8001": { "label": "MCP \u63a5\u5165\u70b9", "visibility": "public", "onAutoForward": "notify" },
+    "8002": { "label": "\u7ba1\u7406\u540e\u53f0", "visibility": "public", "onAutoForward": "notify" }
+  }
+}
