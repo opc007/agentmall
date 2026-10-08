@@ -92,9 +92,9 @@ BANNER
 if [ "${1:-}" = "--check" ]; then
   echo "▶ 跑十二套测试…"
   FAILED=0
-  # auto-discover tests/test_*.py: a hardcoded list silently missed newly added suites once,
-  # and hardcoding means every new test file also needs a script edit.
-  for f in tests/test_*.py; do
+  # auto-discover every suite: a hardcoded list silently missed newly added ones twice
+  # (once the new Phase A suites, once demo_chain.py which has no test_ prefix).
+  for f in tests/test_*.py tests/demo_*.py; do
     t="$(basename "$f" .py)"
     printf "  %-20s " "$t"
     if out="$("$PY" "tests/$t.py" 2>&1)"; then
