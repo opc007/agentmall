@@ -92,7 +92,10 @@ BANNER
 if [ "${1:-}" = "--check" ]; then
   echo "▶ 跑十二套测试…"
   FAILED=0
-  for t in test_readonly demo_chain test_roles test_http_auth test_roadshow test_admin_console test_sourcing test_restart test_user_isolation test_edge_cases test_orders_live; do
+  # auto-discover tests/test_*.py: a hardcoded list silently missed newly added suites once,
+  # and hardcoding means every new test file also needs a script edit.
+  for f in tests/test_*.py; do
+    t="$(basename "$f" .py)"
     printf "  %-20s " "$t"
     if out="$("$PY" "tests/$t.py" 2>&1)"; then
       echo "$out" | grep -oE "PASSED.*|链路 [0-9]+/[0-9]+ 项通过|鉴权 [0-9]+/[0-9]+ 项通过|管理后台 [0-9]+/[0-9]+ 项通过|适配层 [0-9]+/[0-9]+ 项通过|[0-9]+/[0-9]+ 项通过" | tail -1
