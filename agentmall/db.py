@@ -20,10 +20,14 @@ _initialized = False
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS merchants (
-    id          TEXT PRIMARY KEY,
-    name        TEXT NOT NULL,
-    api_key     TEXT NOT NULL UNIQUE,
-    created_at  INTEGER NOT NULL
+    id            TEXT PRIMARY KEY,
+    name          TEXT NOT NULL,
+    api_key       TEXT NOT NULL UNIQUE,
+    -- Phase A 商户自助注册：种子商户没有口令，留空即可（只走 api_key）
+    password_hash TEXT NOT NULL DEFAULT '',
+    -- active: 可正常上架/接单；suspended: 平台停用（管理侧预留）
+    status        TEXT NOT NULL DEFAULT 'active',
+    created_at    INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS admin_keys (
@@ -38,6 +42,10 @@ CREATE TABLE IF NOT EXISTS users (
     username      TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     api_key       TEXT NOT NULL UNIQUE,
+    -- Phase A：首页「让智能体帮我买」直接建单需要地址，但产品决策是
+    -- **不做传统收货地址表单**，所以地址存在用户档案里（个人中心可改），
+    -- 下单时由智能体的 MCP 建单参数提供，网页侧只作默认值。
+    address       TEXT NOT NULL DEFAULT '',
     created_at    INTEGER NOT NULL
 );
 
@@ -137,6 +145,7 @@ def init_db() -> None:
                 conn = connect()
                 try:
                     conn.executescript(SCHEMA)
+                    _migrate(conn)
                     conn.commit()
                     _seed(conn)
                 finally:
@@ -147,6 +156,31 @@ def init_db() -> None:
                 last = exc
                 time.sleep(0.4 * (attempt + 1))
         raise last if last else RuntimeError("init_db 失败")
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    """给已存在的库补新增字段。
+
+    SQLite 的 CREATE TABLE IF NOT EXISTS 不会给老表加列，所以新增字段必须
+    单独 ALTER。老库（Phase 1/Phase 2 早期建的）升级后要能直接跑，不能要求
+    删库重建——路演现场删库等于事故。
+    """
+    wanted = {
+        "users": [
+            ("address", "TEXT NOT NULL DEFAULT ''"),
+        ],
+        "merchants": [
+            ("password_hash", "TEXT NOT NULL DEFAULT ''"),
+            ("status", "TEXT NOT NULL DEFAULT 'active'"),
+        ],
+    }
+    for table, cols in wanted.items():
+        existing = {r["name"] for r in conn.execute(f"PRAGMA table_info({table})")}
+        if not existing:  # 表都还没建，CREATE TABLE 里已经带上了
+            continue
+        for col, ddl in cols:
+            if col not in existing:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}")
 
 
 def _seed(conn: sqlite3.Connection) -> None:

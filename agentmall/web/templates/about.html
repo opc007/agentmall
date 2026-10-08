@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}关于 AgentMall{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <p><a class="btn btn-sm btn-ghost" href="/">← 回商品首页</a></p>
+</section>
+
+<section class="hero">
+  <h1>AgentMall · 智能体原生的日用消费品商城</h1>
+  <p class="lead" style="font-size:15px;opacity:.85">
+    第一次打开看到的是<b>传统商城</b>——商品流、搜索、详情页，可以直接点购买；
+    往下拉你会发现商品有 <b>1200+</b> 个 SKU、15 个类目，价格<b>随时在被商户智能体调整</b>。
+    手动逛是逛不完的——这正是智能体的用处：<b>接一次 MCP，它替你搜、替你比价、替你盯价</b>。
+  </p>
+  <p class="lead">
+    你的 AI 智能体通过 <b>MCP</b> 直接接入商城：搜商品、比价、下单、查单，全程无需打开网页。
+    但钱的事智能体不碰——<b>下单是智能体的，付钱永远是你自己的</b>。
+  </p>
+  <div class="hero-cta">
+    {% if not user %}
+      <a class="btn btn-lg" href="/register">立即注册（30 秒）</a>
+      <a class="btn btn-lg btn-ghost" href="/login">已有账号，登录</a>
+    {% else %}
+      <a class="btn btn-lg" href="/me">去个人中心拿 MCP 接入点 →</a>
+      <a class="btn btn-lg btn-ghost" href="/orders">查看我的订单</a>
+    {% endif %}
+  </div>
+</section>
+
+<section class="cards">
+  <div class="card">
+    <div class="card-no">1</div>
+    <h3>注册 / 登录</h3>
+    <p>用户名 + 密码即可。注册成功直接进个人中心。</p>
+  </div>
+  <div class="card">
+    <div class="card-no">2</div>
+    <h3>复制 MCP 接入点</h3>
+    <p>个人中心给出一段 JSON（含你自己的 api_key），一键复制，粘进任意支持 MCP 的 AI 客户端。</p>
+  </div>
+  <div class="card">
+    <div class="card-no">3</div>
+    <h3>让智能体去买</h3>
+    <p>「帮我找最便宜的抽纸，30 元以内，送到南宁市朝阳广场」——智能体自己搜、自己比价、自己建单。</p>
+  </div>
+  <div class="card">
+    <div class="card-no">4</div>
+    <h3>你来付钱</h3>
+    <p>网页订单列表出现新订单 → 点「去支付」→ 扫码 → 确认支付。<b>智能体全程碰不到钱。</b></p>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>技术形态</h2>
+  <table class="table">
+    <tr><th style="width:200px">接入协议</th><td>MCP（Model Context Protocol），HTTP 端点 <code>/mcp</code>，每请求带 <code>Authorization: Bearer &lt;api_key&gt;</code></td></tr>
+    <tr><th>鉴权</th><td>per-agent key → 角色（用户 / 商户 / 管理员）→ tool 白名单，越权直接拒绝并记审计</td></tr>
+    <tr><th>前端</th><td>FastAPI + Jinja2 纯 HTML，零前端框架、零外部 CDN、零构建</td></tr>
+    <tr><th>支付</th><td><code>MockPaymentGateway</code> 模拟网关（<code>PaymentGateway</code> 接口已预留，真实网关上线只换实现类）</td></tr>
+    <tr><th>数据</th><td>SQLite（商品 / 用户 / 订单 / 审计日志），演示种子数据</td></tr>
+  </table>
+</section>
+
+<section class="panel warn-panel">
+  <h2>⚠️ 演示边界（必须先说清楚）</h2>
+  <ul class="big-list">
+    <li><b>商品为演示数据</b>，不是真实货源的实时商品与库存；</li>
+    <li><b>支付为模拟支付</b>，不接任何真实支付网关，不产生真实资金流水；</li>
+    <li><b>checkout hands off</b>：智能体只建单，付款动作永远由用户本人在浏览器里点击完成；</li>
+    <li>演示订单 <code>is_demo=1</code>，支付后<b>不触发发货</b>，未对接真实履约；</li>
+    <li>本页演示环境的登录态为简化实现（cookie 直接存 api_key），生产环境将替换为正式 session / JWT。</li>
+  </ul>
+</section>
+{% endblock %}

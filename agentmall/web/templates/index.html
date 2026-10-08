@@ -1,66 +1,136 @@
 {% extends "base.html" %}
-{% block title %}首页{% endblock %}
+{% block title %}商城首页{% endblock %}
 
 {% block content %}
-<section class="hero">
-  <h1>AgentMall · 智能体原生的日用消费品商城</h1>
-  <p class="lead">
+
+{# ============ A1 商城商品流 ============ #}
+<section class="page-head">
+  <h1 style="margin:0 0 4px;font-size:22px">🛒 全部商品</h1>
+  <p class="muted" style="margin:0;font-size:14px">
+    {{ total }} 件在售 · 15 个类目 · 价格由商户智能体随时调整，<b>手动逛不完，交给智能体更快</b>
+    <a href="/about" style="margin-left:6px">这是什么？</a>
+  </p>
+</section>
+
+<form class="shop-toolbar" method="get" action="/">
+  <div class="shop-search">
+    <input type="search" name="q" value="{{ q }}" placeholder="搜商品，比如：大米、抽纸、猫粮" autocomplete="off">
+    {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+    <button type="submit">搜索</button>
+  </div>
+</form>
+
+{# 类目横滑：从库动态取，不写死 #}
+<div class="cats">
+  <a href="/" class="{{ 'on' if not category }}">全部{% if not category %}{% endif %}</a>
+  {% for c in categories %}
+  <a href="/?category={{ c.category | urlencode }}{% if q %}&q={{ q | urlencode }}{% endif %}"
+     class="{{ 'on' if category == c.category }}">{{ c.category }}<i>{{ c.count }}</i></a>
+  {% endfor %}
+</div>
+
+{% if items %}
+<div class="goods">
+  {% for p in items %}
+  <a class="card-goods" href="/product/{{ p.id }}">
+    <div class="g-name">{{ p.name }}</div>
+    <div>
+      <span class="g-price">¥{{ '%.2f' | format(p.price) }}<small>/{{ p.unit }}</small></span>
+      {% if p.original_price and p.original_price > p.price %}
+      <span class="g-was">¥{{ '%.2f' | format(p.original_price) }}</span>
+      {% endif %}
+    </div>
+    <div class="g-meta">
+      {% if p.specs %}{{ p.specs }}<br>{% endif %}
+      {% if p.stock > 0 %}
+        <span class="muted">库存 {{ p.stock }}</span>
+      {% else %}
+        <span class="g-out">暂时缺货</span>
+      {% endif %}
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+{% if pages > 1 %}
+<nav class="pager">
+  {% if prev_url %}<a href="{{ prev_url }}">← 上一页</a>
+  {% else %}<span class="off">← 上一页</span>{% endif %}
+  <span class="cur">{{ page }} / {{ pages }}</span>
+  {% if next_url %}<a href="{{ next_url }}">下一页 →</a>
+  {% else %}<span class="off">下一页 →</span>{% endif %}
+</nav>
+{% endif %}
+
+{% else %}
+<div class="empty-box">
+  <p><b>没找到相关商品</b></p>
+  <p class="muted">试试别的关键词，或者
+    <a href="/">看看全部 {{ total }} 件</a>。</p>
+</div>
+{% endif %}
+
+{# ============ 原介绍内容折叠保留（路演要讲"智能体原生"的故事，不能丢） ============ #}
+<details class="panel" style="margin-top:26px">
+  <summary style="cursor:pointer;font-weight:600">🤖 这是个什么商城？点开看看原理</summary>
+  <p class="lead" style="font-size:15px">
     你的 AI 智能体通过 <b>MCP</b> 直接接入商城：搜商品、比价、下单、查单，全程无需打开网页。
     但钱的事智能体不碰——<b>下单是智能体的，付钱永远是你自己的</b>。
   </p>
-  <div class="hero-cta">
-    {% if not user %}
-      <a class="btn btn-lg" href="/register">立即注册（30 秒）</a>
-      <a class="btn btn-lg btn-ghost" href="/login">已有账号，登录</a>
-    {% else %}
-      <a class="btn btn-lg" href="/me">去个人中心拿 MCP 接入点 →</a>
-      <a class="btn btn-lg btn-ghost" href="/orders">查看我的订单</a>
-    {% endif %}
+  <div class="cards">
+    <div class="card"><div class="card-no">1</div><h3>注册 / 登录</h3>
+      <p>用户名 + 密码即可，注册后进个人中心。</p></div>
+    <div class="card"><div class="card-no">2</div><h3>复制 MCP 接入点</h3>
+      <p>个人中心给出一段 JSON（含你自己的 api_key），一键复制，粘进任意支持 MCP 的 AI 客户端。</p></div>
+    <div class="card"><div class="card-no">3</div><h3>让智能体去买</h3>
+      <p>「帮我找最便宜的抽纸，30 元以内」——智能体自己搜、自己比价、自己建单。</p></div>
+    <div class="card"><div class="card-no">4</div><h3>你来付钱</h3>
+      <p>订单列表点「去支付」→ 扫码 → 确认支付。<b>智能体全程碰不到钱。</b></p></div>
   </div>
-</section>
+  <p style="margin-top:14px"><a class="btn btn-sm btn-ghost" href="/about">看完整说明 →</a></p>
+</details>
 
-<section class="cards">
-  <div class="card">
-    <div class="card-no">1</div>
-    <h3>注册 / 登录</h3>
-    <p>用户名 + 密码即可。注册成功直接进个人中心。</p>
+{# ============ A3 首次访问弹窗：只弹一次 ============ #}
+<div id="introMask" class="modal-mask is-hidden" style="display:none">
+  <div class="modal">
+    <h2>👋 欢迎来到 AgentMall</h2>
+    <p class="modal-lead">
+      这里有 <b>1200+ 件</b>日用商品，<b>15 个类目</b>，而且价格<b>随时在被商户智能体调整</b>——
+      手动一个一个翻是翻不完的。<br>
+      你可以现在就随便逛逛，也可以让 AI 智能体替你买。
+    </p>
+    <div class="choices">
+      <a class="choice" href="/me?from=intro">
+        <b>🛒 我是买家 · 让智能体帮我买</b>
+        <span>注册后把接入点粘给你的 AI，它会自己搜、自己比价、自己建单。付钱还是你自己点。</span>
+      </a>
+      <a class="choice" href="/merchant">
+        <b>🏪 我是商家 · 让智能体帮我卖</b>
+        <span>注册商户后，智能体可以帮你上架、改价、接单、发货——你不用推广也不用雇人。</span>
+      </a>
+    </div>
+    <button class="choice-x" id="introClose">先随便逛逛，不用注册 →</button>
   </div>
-  <div class="card">
-    <div class="card-no">2</div>
-    <h3>复制 MCP 接入点</h3>
-    <p>个人中心给出一段 JSON（含你自己的 api_key），一键复制，粘进任意支持 MCP 的 AI 客户端。</p>
-  </div>
-  <div class="card">
-    <div class="card-no">3</div>
-    <h3>让智能体去买</h3>
-    <p>「帮我找最便宜的抽纸，30 元以内，送到南宁市朝阳广场」——智能体自己搜、自己比价、自己建单。</p>
-  </div>
-  <div class="card">
-    <div class="card-no">4</div>
-    <h3>你来付钱</h3>
-    <p>网页订单列表出现新订单 → 点「去支付」→ 扫码 → 确认支付。<b>智能体全程碰不到钱。</b></p>
-  </div>
-</section>
+</div>
 
-<section class="panel">
-  <h2>技术形态</h2>
-  <table class="table">
-    <tr><th style="width:200px">接入协议</th><td>MCP（Model Context Protocol），HTTP 端点 <code>/mcp</code>，每请求带 <code>Authorization: Bearer &lt;api_key&gt;</code></td></tr>
-    <tr><th>鉴权</th><td>per-agent key → 角色（用户 / 商户 / 管理员）→ tool 白名单，越权直接拒绝并记审计</td></tr>
-    <tr><th>前端</th><td>FastAPI + Jinja2 纯 HTML，零前端框架、零外部 CDN、零构建</td></tr>
-    <tr><th>支付</th><td><code>MockPaymentGateway</code> 模拟网关（<code>PaymentGateway</code> 接口已预留，真实网关上线只换实现类）</td></tr>
-    <tr><th>数据</th><td>SQLite（商品 / 用户 / 订单 / 审计日志），演示种子数据</td></tr>
-  </table>
-</section>
-
-<section class="panel warn-panel">
-  <h2>⚠️ 演示边界（必须先说清楚）</h2>
-  <ul class="big-list">
-    <li><b>商品为演示数据</b>，不是真实货源的实时商品与库存；</li>
-    <li><b>支付为模拟支付</b>，不接任何真实支付网关，不产生真实资金流水；</li>
-    <li><b>checkout hands off</b>：智能体只建单，付款动作永远由用户本人在浏览器里点击完成；</li>
-    <li>演示订单 <code>is_demo=1</code>，支付后<b>不触发发货</b>，未对接真实履约；</li>
-    <li>本页演示环境的登录态为简化实现（cookie 直接存 api_key），生产环境将替换为正式 session / JWT。</li>
-  </ul>
-</section>
+<script>
+// 首次访问才弹：localStorage 标记 am_seen_intro，只弹一次。
+// 关掉也要能重新打开——页脚的「怎么用智能体」入口就是干这个的。
+(function () {
+  var KEY = 'am_seen_intro';
+  var mask = document.getElementById('introMask');
+  if (!mask) return;
+  function open() { mask.style.display = 'flex'; }
+  function close() {
+    try { localStorage.setItem(KEY, '1'); } catch (e) {}
+    mask.style.display = 'none';
+  }
+  if (!localStorage.getItem(KEY)) { open(); }
+  document.getElementById('introClose').addEventListener('click', close);
+  // 点遮罩空白处也能关，但别让人「想关却关不掉」
+  mask.addEventListener('click', function (e) { if (e.target === mask) close(); });
+  // 供其他入口复用
+  window.amOpenIntro = function () { try { localStorage.removeItem(KEY); } catch (e) {} open(); };
+})();
+</script>
 {% endblock %}

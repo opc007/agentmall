@@ -67,10 +67,11 @@ class Store:
     # ---- 商品 ----
     def search(self, keyword: str = "", category: str | None = None,
                max_price: float | None = None, limit: int = 10,
-               only_on_sale: bool = True) -> list:
+               only_on_sale: bool = True, offset: int = 0) -> list:
         """关键词模糊匹配 name/category，按价格升序。
 
         only_on_sale=True 时只返回在售商品（待审核/下架对用户不可见）。
+        offset 用于首页商品流分页。
         """
         kw = (keyword or "").strip()
         sql = ["SELECT * FROM products WHERE 1=1"]
@@ -86,11 +87,45 @@ class Store:
         if max_price:
             sql.append("AND price <= ?")
             args.append(float(max_price))
-        sql.append("ORDER BY price ASC LIMIT ?")
-        args.append(max(int(limit), 1))
+        sql.append("ORDER BY price ASC LIMIT ? OFFSET ?")
+        args += [max(int(limit), 1), max(int(offset), 0)]
         with closing(db.connect()) as conn:
             rows = conn.execute(" ".join(sql), args).fetchall()
         return [dict(r) for r in rows]
+
+    def count(self, keyword: str = "", category: str | None = None,
+              max_price: float | None = None, only_on_sale: bool = True) -> int:
+        """商品流总数，用于分页。与 search 用同一套过滤条件。"""
+        kw = (keyword or "").strip()
+        sql = ["SELECT COUNT(*) c FROM products WHERE 1=1"]
+        args: list = []
+        if only_on_sale:
+            sql.append("AND status = '在售'")
+        if kw:
+            sql.append("AND (name LIKE ? OR category LIKE ?)")
+            args += [f"%{kw}%", f"%{kw}%"]
+        if category:
+            sql.append("AND category = ?")
+            args.append(category)
+        if max_price:
+            sql.append("AND price <= ?")
+            args.append(float(max_price))
+        with closing(db.connect()) as conn:
+            return int(conn.execute(" ".join(sql), args).fetchone()["c"])
+
+    def list_categories(self, only_on_sale: bool = True) -> list[dict]:
+        """类目列表（首页横滑筛选用）。
+
+        **从库动态取，不写死**——类目会随货源同步变化（Phase A 已有 15 个类目），
+        写死在前端意味着加类目要改两处。
+        """
+        sql = "SELECT category, COUNT(*) n FROM products"
+        if only_on_sale:
+            sql += " WHERE status='在售'"
+        sql += " GROUP BY category ORDER BY n DESC, category ASC"
+        with closing(db.connect()) as conn:
+            return [{"category": r["category"], "count": int(r["n"])}
+                    for r in conn.execute(sql).fetchall()]
 
     def get(self, product_id: str) -> dict:
         with closing(db.connect()) as conn:
