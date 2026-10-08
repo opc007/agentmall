@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}商城首页{% endblock %}
+
+{% block content %}
+<form class="shop-search" method="get" action="/">
+  <input type="search" name="q" placeholder="搜商品：大米、洗发水、纸巾…" value="{{ q or '' }}">
+  {% if cat %}<input type="hidden" name="cat" value="{{ cat }}">{% endif %}
+  <button class="btn" type="submit">搜索</button>
+</form>
+
+<nav class="cat-chips">
+  <a href="/?{% if q %}q={{ q|urlencode }}{% endif %}" class="{% if not cat %}on{% endif %}">全部</a>
+  {% for c in categories %}
+    <a href="/?cat={{ c|urlencode }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="{% if cat == c %}on{% endif %}">{{ c }}</a>
+  {% endfor %}
+</nav>
+
+<p class="result-meta">
+  {% if q or cat %}
+    {% if q %}“{{ q }}”{% endif %}{% if cat %} · {{ cat }}{% endif %}，共 {{ total }} 件商品
+  {% else %}
+    全部商品共 {{ total }} 件 · 价格实时动态，以智能体实时查询为准
+  {% endif %}
+</p>
+
+<div class="product-grid">
+  {% for p in products %}
+  <a class="product-card" href="/product/{{ p.id }}">
+    <span class="p-cat">{{ p.category }}</span>
+    <span class="p-name">{{ p.name }}</span>
+    <span class="p-specs">{{ p.specs }}</span>
+    <span class="p-price">
+      <span class="now">¥{{ '%.2f'|format(p.price) }}</span>
+      {% if p.original_price and p.original_price > p.price %}
+      <span class="was">¥{{ '%.2f'|format(p.original_price) }}</span>
+      {% endif %}
+    </span>
+  </a>
+  {% else %}
+  <p>没有找到相关商品，换个关键词试试。</p>
+  {% endfor %}
+</div>
+
+{% if pages > 1 %}
+<div class="pager">
+  {% if page > 1 %}
+    <a class="btn btn-ghost btn-sm" href="/?page={{ page - 1 }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if cat %}&cat={{ cat|urlencode }}{% endif %}">← 上一页</a>
+  {% endif %}
+  <span class="p-info">第 {{ page }} / {{ pages }} 页</span>
+  {% if page < pages %}
+    <a class="btn btn-ghost btn-sm" href="/?page={{ page + 1 }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if cat %}&cat={{ cat|urlencode }}{% endif %}">下一页 →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+<p style="text-align:center; margin-top: 18px;">
+  <a href="/about" style="color: var(--ink-soft); font-size: .85rem;">什么是 AgentMall？智能体原生商城介绍 →</a>
+</p>
+{% endblock %}
