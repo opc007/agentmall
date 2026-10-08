@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}商户门户{% endblock %} · AgentMall 商户</title>
+<!-- 本套模板自包含：无外部 CSS/JS/CDN（路演沙箱可能没外网，离线必须能看） -->
+<style>
+:root{--bg:#0f1420;--card:#182032;--card2:#0e1524;--line:#2a3550;--fg:#eaf0ff;--muted:#93a3c0;--acc:#4f8cff;--ok:#28c76f;--err:#ff5c5c;--warn:#ffb020}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.6}
+a{color:var(--acc);text-decoration:none}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;background:var(--card2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;word-break:break-all}
+.banner{background:#3a2410;border-bottom:2px solid var(--warn);color:#ffd08a;padding:10px 16px;font-weight:700;text-align:center;font-size:14px}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{font-size:18px;margin:0;flex:1;min-width:160px}
+nav{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+nav a{color:var(--muted);font-weight:600}
+nav a.on{color:var(--acc)}
+main{padding:16px;max-width:900px;margin:0 auto;padding-bottom:48px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.card h2{font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card h2 .step{background:var(--acc);color:#fff;border-radius:6px;font-size:13px;padding:1px 8px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+/* 手机优先：卡片 + flex/grid，不使用宽表格 */
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.kv .item{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px}
+.kv .l{color:var(--muted);font-size:13px}
+.kv .v{font-weight:700;font-size:16px;word-break:break-all}
+pre.code{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;white-space:pre;margin:10px 0}
+.btn{background:var(--acc);color:#fff;border:none;border-radius:9px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer}
+.btn:hover{filter:brightness(1.1)}
+.btn.ghost{background:var(--card2);color:var(--fg);border:1px solid var(--line)}
+.btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tip{font-size:13px;color:var(--ok);min-height:18px}
+.msg{padding:10px 14px;border-radius:9px;margin-bottom:14px;font-weight:600}
+.msg.ok{background:#0d3320;color:#6ee7a0;border:1px solid #1c5c39}
+.msg.err{background:#3d1010;color:#ff9a9a;border:1px solid #6b2020}
+.note{border-left:4px solid var(--warn);background:#2a2213;color:#ffd9a1;padding:10px 12px;border-radius:8px;margin:10px 0;font-size:14px}
+.note.red{border-left-color:var(--err);background:#2c1515;color:#ffb3b3}
+ol,ul{padding-left:22px;margin:8px 0}
+li{margin:4px 0}
+.tool{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--card2)}
+.tool .name{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:var(--acc);word-break:break-all}
+.tool .sig{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--muted);word-break:break-all;margin:4px 0}
+.tool .note-in{color:#ffd9a1;font-size:14px;margin-top:6px}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#0d3320;color:#6ee7a0}
+.badge.warn{background:#3a2a10;color:#ffcf7a}
+/* ---- 表单（登录/注册）---- */
+.auth-wrap{max-width:460px;margin:24px auto;padding:0 16px}
+.auth-box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.auth-box h1{font-size:20px;margin:0 0 6px}
+.auth-box p.sub{color:var(--muted);margin:0 0 18px;font-size:14px}
+label{display:block;font-size:14px;color:var(--muted);margin:12px 0 4px}
+input[type=text],input[type=password]{width:100%;padding:11px 13px;border-radius:9px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font:inherit}
+.hint{margin-top:16px;padding:11px;background:var(--card2);border:1px dashed var(--line);border-radius:9px;font-size:13px;color:var(--muted)}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:0 16px 24px}
+@media (max-width:480px){ header h1{font-size:17px} main{padding:12px} .card{padding:14px} }
+</style>
+</head>
+<body>
+<div class="banner">⚠️ 演示环境 · 演示数据 · 模拟支付，不发生任何真实交易</div>
+<header>
+  <h1>🏪 AgentMall 商户门户</h1>
+  <nav>
+    {% if merchant %}
+      <a href="{{ base|default('') }}/" class="on">工作台</a>
+      <span class="badge">{{ merchant.name }}</span>
+      <form method="post" action="{{ base|default('') }}/logout" style="margin:0">
+        <button class="btn ghost" type="submit">退出登录</button>
+      </form>
+    {% else %}
+      <a href="{{ base|default('') }}/login">商户登录</a>
+      <a href="{{ base|default('') }}/register">开店注册</a>
+    {% endif %}
+  </nav>
+</header>
+<main>
+  {% if msg|default('') %}<div class="msg {{ level|default('ok') }}">{{ msg }}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+<footer>AgentMall 商户门户 · 演示数据 · 不接真实支付 · 不接 1688 真实 API</footer>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{% extends "merchant_base.html" %}
+{% block title %}服务出错了{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+    <h1>服务出错了（500）</h1>
+    <p class="sub">这一页没能正常打开，别担心，你的店铺和 key 都没丢。</p>
+    <div class="hint">
+      可以试试：<br>
+      · 刷新一下（演示环境偶发的瞬时问题，刷新通常就好了）；<br>
+      · 还是不行就回到<a href="{{ base|default('') }}/">商户门户</a>，重新登录一次；<br>
+      · 持续出错说明商户门户进程可能挂了，重新起一次
+        <code>uvicorn agentmall.web.merchant_app:app --port 8003</code> 即可。
+    </div>
+    <div class="btn-row" style="margin-top:18px">
+      <a class="btn" href="{{ base|default('') }}/">← 回商户门户</a>
+      <a class="btn ghost" href="{{ base|default('') }}/login">去登录</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

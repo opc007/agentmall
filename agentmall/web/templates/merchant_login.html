@@ -1,0 +1,30 @@
+{% extends "merchant_base.html" %}
+{% block title %}商户登录{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+    <h1>🏪 商户登录</h1>
+    <p class="sub">用注册时的店名 + 密码进入你的商户工作台</p>
+
+    {% if error %}<div class="msg err">{{ error }}</div>{% endif %}
+
+    <form method="post" action="{{ base }}/login">
+      <label for="name">店名</label>
+      <input id="name" type="text" name="name" value="{{ name }}" placeholder="例如：日用优选生活馆" required autofocus>
+      <label for="password">密码</label>
+      <input id="password" type="password" name="password" placeholder="注册时设置的密码" required>
+      <div class="btn-row" style="margin-top:18px">
+        <button class="btn" type="submit">登录</button>
+        <a class="btn ghost" href="{{ base }}/register">还没开店？去注册</a>
+      </div>
+    </form>
+
+    <div class="hint">
+      演示种子商户（M001 / M002 / M003）<b>没有网页口令</b>，它们只用 API key 接入 MCP，
+      无法用密码登录网页——要在网页里用，请走
+      <a href="{{ base }}/register">自助注册</a> 开一个新店。
+    </div>
+  </div>
+</div>
+{% endblock %}

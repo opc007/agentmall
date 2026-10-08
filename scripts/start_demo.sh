@@ -8,6 +8,7 @@
 #   :8000  用户面 Web   —— 注册/登录/个人中心/订单列表/模拟收银台
 #   :8001  MCP Server   —— streamable-http，AI 客户端按「URL + Bearer key」接入
 #   :8002  管理后台     —— 独立进程，与用户面物理隔离（三权分立）
+#   :8003  商户门户     —— 商户自助注册 + MCP 接入点，同样独立进程
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -16,6 +17,7 @@ cd "$ROOT"
 WEB_PORT="${AGENTMALL_WEB_PORT:-8000}"
 MCP_PORT="${AGENTMALL_MCP_PORT:-8001}"
 ADMIN_PORT="${AGENTMALL_ADMIN_PORT:-8002}"
+MERCHANT_PORT="${AGENTMALL_MERCHANT_PORT:-8003}"
 PY="${PYTHON:-.venv/bin/python}"
 [ -x "$PY" ] || PY="$(command -v python3)"
 
@@ -36,6 +38,7 @@ fi
 
 export AGENTMALL_MCP_PORT="$MCP_PORT"
 export AGENTMALL_ADMIN_PORT="$ADMIN_PORT"
+export AGENTMALL_MERCHANT_PORT="$MERCHANT_PORT"
 export AGENTMALL_PUBLIC_URL="${AGENTMALL_PUBLIC_URL:-http://127.0.0.1:$WEB_PORT}"
 
 wait_up() {  # url, 名字
@@ -58,9 +61,14 @@ echo "▶ 启动管理后台 (:$ADMIN_PORT)…"
 "$PY" -m uvicorn agentmall.web.admin_app:app --port "$ADMIN_PORT" >/tmp/agentmall_admin.log 2>&1 &
 PIDS+=($!)
 
+echo "▶ 启动商户门户 (:$MERCHANT_PORT)…"
+"$PY" -m uvicorn agentmall.web.merchant_app:app --port "$MERCHANT_PORT" >/tmp/agentmall_merchant.log 2>&1 &
+PIDS+=($!)
+
 wait_up "http://127.0.0.1:$WEB_PORT/healthz"  "用户面"
 wait_up "http://127.0.0.1:$MCP_PORT/healthz"  "MCP Server"
 wait_up "http://127.0.0.1:$ADMIN_PORT/healthz" "管理后台"
+wait_up "http://127.0.0.1:$MERCHANT_PORT/healthz" "商户门户"
 
 cat <<BANNER
 
@@ -69,13 +77,14 @@ cat <<BANNER
 ════════════════════════════════════════════════════════════
   用户面      http://127.0.0.1:$WEB_PORT
   管理后台    http://127.0.0.1:$ADMIN_PORT   （管理员 key: ak_demo_admin_secret）
+  商户门户    http://127.0.0.1:$MERCHANT_PORT （商户自助注册入口）
   MCP 接入点  http://127.0.0.1:$MCP_PORT/mcp
 
   路演：注册 → 个人中心复制接入点 → 配给 AI 客户端
         → 说「找最便宜的抽纸，30 元以内」→ 网页订单点「去支付」→ 扫码确认
         → 切管理后台看订单数 +1、GMV 变化
 
-  日志：/tmp/agentmall_{web,mcp,admin}.log
+  日志：/tmp/agentmall_{web,mcp,admin,merchant}.log
 ════════════════════════════════════════════════════════════
 
 BANNER

@@ -1,0 +1,126 @@
+{% extends "merchant_base.html" %}
+{% block title %}商户工作台{% endblock %}
+
+{% block content %}
+
+<!-- ===== 店铺信息 ===== -->
+<section class="card">
+  <h2>🏪 我的店铺</h2>
+  <div class="kv">
+    <div class="item"><div class="l">商户号</div><div class="v">{{ merchant.merchant_id }}</div></div>
+    <div class="item"><div class="l">店名</div><div class="v">{{ merchant.name }}</div></div>
+    <div class="item"><div class="l">注册时间</div><div class="v">{{ merchant.created_at|dt }}</div></div>
+    <div class="item"><div class="l">商品数</div><div class="v">{{ n_products }}</div></div>
+    <div class="item"><div class="l">订单数</div><div class="v">{{ n_orders }}</div></div>
+    <div class="item">
+      <div class="l">状态</div>
+      <div class="v">
+        {% if merchant.status == 'active' %}
+          <span class="badge">正常</span>
+        {% else %}
+          <span class="badge warn">{{ merchant.status }}</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <p class="muted small" style="margin-top:10px">
+    只看得到本店的商品与订单：门户按 <code>merchant_id</code> 过滤，其他商户的数据不会出现在这里。
+  </p>
+</section>
+
+<!-- ===== 核心：MCP 接入点，一键复制 ===== -->
+<section class="card">
+  <h2><span class="step">①</span>MCP 接入点（复制这段 JSON，粘进你的 AI 客户端）</h2>
+  <p class="muted small">
+    端点：<code>{{ mcp_endpoint }}</code>　·
+    鉴权：<code>Authorization: Bearer &lt;你的 api_key&gt;</code>
+  </p>
+
+  <pre id="mcp-cfg" class="code">{{ mcp_cfg_text }}</pre>
+  <div class="btn-row">
+    <button class="btn" type="button" onclick="copyText('mcp-cfg', this)">📋 一键复制接入点 JSON</button>
+    <span id="copy-tip" class="tip"></span>
+  </div>
+
+  <ol>
+    <li>复制上面这段 JSON（<b>远程 Streamable HTTP</b> 接入格式），服务器名是 <code>agentmall-merchant</code>；</li>
+    <li>粘进支持<b>远程 MCP</b> 的客户端：<b>Cursor、Cherry Studio、VS Code / Copilot</b>；
+        或在 <b>Claude Code</b> 里执行
+        <code>claude mcp add --transport http agentmall-merchant {{ mcp_endpoint }} --header "Authorization: Bearer &lt;你的 api_key&gt;"</code>；</li>
+    <li>保存后确认工具列表里有 <b>5 个</b>：merchant_publish_product / merchant_update_product /
+        merchant_list_products / merchant_list_orders / merchant_fulfill_order；</li>
+    <li>对智能体说：「帮我把『厨房纸 30 抽』上架，价格 19.9，库存 200 件」。</li>
+  </ol>
+</section>
+
+<!-- ===== api_key 明文 ===== -->
+<section class="card">
+  <h2><span class="step">②</span>你的 API Key（明文展示）</h2>
+  <p class="muted small">这是<b>你自己店</b>的 key，只给你自己的智能体用。请勿外传、别截全图发群里——它能改价、改库存、发货。</p>
+  <pre id="api-key" class="code">{{ merchant.api_key }}</pre>
+  <div class="btn-row">
+    <button class="btn" type="button" onclick="copyText('api-key', this)">📋 复制 API Key</button>
+    <span id="copy-tip2" class="tip"></span>
+  </div>
+</section>
+
+<!-- ===== 两条最容易踩的坑 ===== -->
+<section class="card">
+  <h2>⚠️ 两件最容易踩的事</h2>
+  <div class="note red">
+    <b>① 新上架的商品是「待审核」，买家搜不到。</b><br>
+    <code>merchant_publish_product</code> 返回 <code>status: "待审核"</code>，只有管理员在管理后台审核通过才变成「在售」。
+    搜不到商品 ≠ 上架失败，去问审核，别急着重复上架。
+  </div>
+  <div class="note">
+    <b>② <code>merchant_update_product</code> 的 <code>price</code> / <code>stock</code> 不传就不改。</b><br>
+    不传 = 保持原样，传了才会改（<code>price&lt;=0</code>、<code>stock&lt;0</code> 在 MCP 层同样算「不传」）。
+    三个都不传会直接报「price / stock / on_sale 至少指定一个」。
+  </div>
+</section>
+
+<!-- ===== 5 个 tool 的能力指引 ===== -->
+<section class="card">
+  <h2>🤖 你能用的 5 个 MCP 工具</h2>
+  <p class="muted small">说明取自平台服务层（roles.py MerchantService）的实际行为，不是文案承诺。</p>
+  {% for t in tools %}
+  <div class="tool">
+    <div class="name">{{ t.tool }}</div>
+    {% if t.params %}<div class="sig">({{ t.params }})</div>{% endif %}
+    <div>{{ t.summary }}</div>
+    {% if t.detail %}<div class="muted small">{{ t.detail }}</div>{% endif %}
+    {% if t.notes %}<div class="note-in">👉 {{ t.notes }}</div>{% endif %}
+  </div>
+  {% endfor %}
+  <div class="note">
+    边界：商户侧<b>不碰支付</b>（待支付订单不能发货，也拿不到买家的支付链接），
+    只能动自己店的商品与订单，改到别家会被拒绝并记审计日志。
+  </div>
+</section>
+
+<script>
+// 纯 JS 一键复制：优先 navigator.clipboard，非 https / 老浏览器回退 execCommand。
+function copyText(id, btn) {
+  var text = (document.getElementById(id) || {}).textContent || "";
+  var tip = document.getElementById(id === 'mcp-cfg' ? 'copy-tip' : 'copy-tip2');
+  function done(ok) {
+    if (tip) { tip.textContent = ok ? '✅ 已复制到剪贴板' : '复制失败，请手动全选复制'; tip.style.color = ok ? '#6ee7a0' : '#ff9a9a'; }
+    if (btn && ok) { var old = btn.textContent; btn.textContent = '✅ 已复制'; setTimeout(function () { btn.textContent = old; }, 1500); }
+  }
+  function legacy() {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(legacy()); });
+  } else {
+    done(legacy());
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "merchant_base.html" %}
+{% block title %}页面不存在{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+    <h1>页面不存在（404）</h1>
+    <p class="sub">地址可能输错了，或者链接已过期。</p>
+    <div class="hint">
+      你可能想去这里：<br>
+      · <a href="{{ base|default('') }}/">商户工作台</a> —— MCP 接入点 + 店铺信息<br>
+      · <a href="{{ base|default('') }}/register">开店注册</a> —— 还没有店就注册一个<br>
+      · <a href="{{ base|default('') }}/login">商户登录</a>
+    </div>
+    <div class="btn-row" style="margin-top:18px">
+      <a class="btn" href="{{ base|default('') }}/">← 回商户门户</a>
+      <a class="btn ghost" href="{{ base|default('') }}/login">去登录</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

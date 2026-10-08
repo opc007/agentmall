@@ -1,0 +1,35 @@
+{% extends "merchant_base.html" %}
+{% block title %}开店注册{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+    <h1>🏪 商户自助注册</h1>
+    <p class="sub">30 秒开一个店，立刻拿到属于你店里的 MCP 接入点和 API key</p>
+
+    {% if error %}<div class="msg err">{{ error }}</div>{% endif %}
+
+    <form method="post" action="{{ base }}/register">
+      <label for="name">店名（2–30 字）</label>
+      <input id="name" type="text" name="name" value="{{ name }}" placeholder="例如：南宁好物日杂" required autofocus>
+
+      <label for="password">密码（至少 8 位）</label>
+      <input id="password" type="password" name="password" placeholder="给自己智能体用的入口口令" required>
+
+      <label for="confirm">确认密码</label>
+      <input id="confirm" type="password" name="confirm" placeholder="再输一遍" required>
+
+      <div class="btn-row" style="margin-top:18px">
+        <button class="btn" type="submit">注册并进入工作台</button>
+        <a class="btn ghost" href="{{ base }}/login">已有账号？去登录</a>
+      </div>
+    </form>
+
+    <div class="hint">
+      <b>注册完立即可用</b>（状态 active），不用等审核。
+      需要审核的是<b>商品上架</b>：你上架的新商品是「待审核」状态，
+      买家搜不到，要平台管理员审核通过才在售。
+    </div>
+  </div>
+</div>
+{% endblock %}
