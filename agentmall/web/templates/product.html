@@ -1,133 +1,47 @@
 {% extends "base.html" %}
-{% block title %}{{ product.name }}{% endblock %}
+{% block title %}{{ p.name }}{% endblock %}
 
 {% block content %}
-<p style="margin:0 0 14px"><a class="btn btn-sm btn-ghost" href="/">← 全部商品</a></p>
+<p style="margin-bottom: 10px;"><a href="/" style="color: var(--ink-soft);">← 返回商城</a></p>
 
-<section class="panel">
-  <h1 style="font-size:21px;line-height:1.5;margin:0 0 4px">{{ product.name }}</h1>
-  <p class="muted" style="margin:0 0 10px;font-size:13px">
-    {{ product.category }} · {{ product.merchant_id }} · 商品编号 {{ product.id }}
-  </p>
+<div class="product-detail">
+  <span class="p-cat">{{ p.category }}</span>
+  <h1>{{ p.name }}</h1>
+  <p class="p-specs">规格：{{ p.specs }} · 单位：{{ p.unit }}</p>
 
-  <div>
-    <span class="pd-price">¥{{ '%.2f' | format(product.price) }}</span>
-    {% if product.original_price and product.original_price > product.price %}
-    <span class="pd-was">¥{{ '%.2f' | format(product.original_price) }}</span>
-    <span class="badge badge-done">省 ¥{{ '%.2f' | format(product.original_price - product.price) }}</span>
+  <div class="detail-price">
+    <span class="now">¥{{ '%.2f'|format(p.price) }}</span>
+    {% if p.original_price and p.original_price > p.price %}
+    <span class="was">原价 ¥{{ '%.2f'|format(p.original_price) }}</span>
     {% endif %}
-    <span class="muted" style="margin-left:8px;font-size:14px">/ {{ product.unit }}</span>
   </div>
 
-  <div class="pd-row"><b>规格</b><span>{{ product.specs or '—' }}</span></div>
-  <div class="pd-row"><b>库存</b>
-    <span>{% if product.stock > 0 %}{{ product.stock }} {{ product.unit }}
-    {% else %}<span class="g-out">暂时缺货</span>{% endif %}</span></div>
-  <div class="pd-row"><b>价格说明</b>
-    <span class="muted">演示数据。价格由商户智能体随时可调，下单时以建单当时的价格锁定。</span></div>
-  <div class="pd-row"><b>配送</b><span class="muted">演示环境不发货</span></div>
+  <table class="detail-meta">
+    <tr><td style="width:90px; color: var(--ink-soft);">商品编号</td><td>{{ p.id }}</td></tr>
+    <tr><td style="color: var(--ink-soft);">库存</td><td>{% if p.stock > 0 %}有货（{{ p.stock }}）{% else %}缺货{% endif %}</td></tr>
+    <tr><td style="color: var(--ink-soft);">价格说明</td><td>智能体商户实时动态调价，下单时以当时价格锁定为准</td></tr>
+  </table>
 
-  {# ============ A6 购买转化 ============ #}
-  <div class="pd-buy">
-    <h3>🤖 让智能体帮我买这件</h3>
-    <p class="muted" style="font-size:14px;line-height:1.7;margin:0 0 14px">
-      商城有 <b>1200+</b> 件商品、15 个类目，价格随时在变。
-      智能体能<b>一次搜完全部商品、跨类目比价、按你的预算筛</b>，还能盯住价格变动——
-      这些手动做起来很慢。
-    </p>
-    {% if user and user.role == 'user' %}
-      <form method="post" action="/buy/{{ product.id }}">
-        <button class="btn btn-lg" type="submit">🤖 让智能体帮我下单</button>
-      </form>
-      <p class="muted" style="font-size:12px;margin:10px 0 0">
-        下单后你会跳到收银台扫码，<b>付款由你自己点击完成</b>，智能体碰不到钱。
-      </p>
+  {% if error %}
+  <div class="alert alert-error">{{ error }}</div>
+  {% endif %}
+
+  {% if p.stock > 0 %}
+  <form method="post" action="/buy/{{ p.id }}">
+    <div class="buy-row">
+      <input class="qty" type="number" name="quantity" value="1" min="1" max="{{ p.stock }}">
+      <button class="btn btn-xl" type="submit" style="flex:1;">立即购买</button>
+    </div>
+  </form>
+  <p class="buy-hint">
+    {% if user %}
+      下单后跳收银台扫码支付（模拟支付）。想让智能体自动比价下单？<a href="/me">去个人中心接入智能体 →</a>
     {% else %}
-      <button class="btn btn-lg" type="button" id="buyBtn">🤖 让智能体帮我下单</button>
-      <p class="muted" style="font-size:12px;margin:10px 0 0">
-        演示环境 · 支付为模拟支付，不发生任何真实交易
-      </p>
+      下单需要先 <a href="/login?next=/product/{{ p.id }}">登录</a> / <a href="/register?next=/product/{{ p.id }}">注册</a>（30 秒）。也可以 <a href="/me">接入智能体</a>，让它替你自动下单。
     {% endif %}
-  </div>
-</section>
-
-<p class="muted" style="font-size:13px">
-  不着急？<a href="#" id="reopenIntro">看看智能体怎么帮我买</a>
-</p>
-
-{# ============ A6 转化弹窗：两屏 ============ #}
-{# 第 1 屏讲价值（不出现注册表单），用户点了才进第 2 屏 #}
-<div id="buyMask" class="modal-mask is-hidden" style="display:none">
-  <div class="modal" id="buyStep1">
-    <h2>🤖 让智能体帮你买，先说清楚三件事</h2>
-    <div class="choices" style="margin-top:14px">
-      <div class="choice"><b>① 搜得比你全</b>
-        <span>1200+ 件商品、15 个类目，一次问完，不用一个标签页一个标签页翻。</span></div>
-      <div class="choice"><b>② 比得比你准</b>
-        <span>跨类目比价、按预算筛、把规格换算成单抽/单公斤——手动比很容易被误导。</span></div>
-      <div class="choice"><b>③ 价格变动跟得上</b>
-        <span>商户随时调价，智能体按你给的规则盯，合适了才叫你。</span></div>
-    </div>
-    <p class="muted" style="font-size:13px;line-height:1.7;margin:16px 0 0">
-      接一次就够：注册后拿到一个专属接入点，粘进你常用的 AI 客户端，以后一句话下单。
-    </p>
-    <div class="btn-row" style="margin-top:16px">
-      <button class="btn" type="button" id="toStep2">好，我要接智能体</button>
-      <button class="btn btn-ghost" type="button" data-close>先不接</button>
-    </div>
-  </div>
-
-  <div class="modal" id="buyStep2" style="display:none">
-    <h2>30 秒接好你的智能体</h2>
-    <p class="modal-lead">两步：注册 → 复制接入点粘给你的 AI。</p>
-    <div class="choices">
-      <a class="choice" href="/register?next={{ '/product/' ~ product.id | urlencode }}">
-        <b>① 我还没有账号 → 注册（30 秒）</b>
-        <span>只要用户名和密码，注册完直接进个人中心拿接入点。</span></a>
-      <a class="choice" href="/login?next={{ '/product/' ~ product.id | urlencode }}">
-        <b>② 我有账号 → 登录</b>
-        <span>登录后点上面的「让智能体帮我下单」即可。</span></a>
-    </div>
-    <p class="muted" style="font-size:12px;margin:16px 0 0">
-      也可以先<a href="#" id="fromStep2Intro">看看不接智能体怎么逛</a>——
-      逛商品、查价格完全不需要注册。
-    </p>
-    <button class="choice-x" data-close>← 返回</button>
-  </div>
+  </p>
+  {% else %}
+  <p class="alert alert-warn">该商品暂时缺货。</p>
+  {% endif %}
 </div>
-
-{% if buy_err %}
-<div class="alert alert-error" style="margin-top:12px">{{ buy_err }}</div>
-{% endif %}
-
-<script>
-(function () {
-  var mask = document.getElementById('buyMask');
-  if (!mask) return;
-  var s1 = document.getElementById('buyStep1');
-  var s2 = document.getElementById('buyStep2');
-  function open(step) {
-    s1.style.display = step === 2 ? 'none' : 'block';
-    s2.style.display = step === 2 ? 'block' : 'none';
-    mask.style.display = 'flex';
-  }
-  function close() { mask.style.display = 'none'; }
-  var btn = document.getElementById('buyBtn');
-  if (btn) btn.addEventListener('click', function () { open(1); });
-  // 从详情页直接进来（?need_login=1）或下单失败回跳时自动弹出
-  {% if need_login %}open(1);{% endif %}
-  var t2 = document.getElementById('toStep2');
-  if (t2) t2.addEventListener('click', function () { open(2); });
-  mask.addEventListener('click', function (e) {
-    if (e.target === mask || e.target.hasAttribute('data-close')) close();
-  });
-  var ri = document.getElementById('reopenIntro');
-  if (ri) ri.addEventListener('click', function (e) {
-    e.preventDefault();
-    if (window.amOpenIntro) window.amOpenIntro();
-  });
-  var fs = document.getElementById('fromStep2Intro');
-  if (fs) fs.addEventListener('click', function (e) { e.preventDefault(); close(); });
-})();
-</script>
 {% endblock %}
