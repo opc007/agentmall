@@ -33,6 +33,9 @@
 <div class="goods">
   {% for p in items %}
   <a class="card-goods" href="/product/{{ p.id }}">
+    {# 类目图：文件名全部走 cat_url 映射，绝不写死；loading=lazy 是 1208 SKU 的命根子 #}
+    <img class="g-img" src="{{ p.category | cat_url }}" alt="{{ p.category }}" loading="lazy"
+         onerror="this.onerror=null;this.src='/static/img/category/cat-shipin.jpg'">
     <div class="g-name">{{ p.name }}</div>
     <div>
       <span class="g-price">¥{{ '%.2f' | format(p.price) }}<small>/{{ p.unit }}</small></span>

@@ -48,6 +48,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from agentmall import auth, db  # noqa: E402
 from agentmall.roles import merchant_service  # noqa: E402
+from agentmall.web import catimg  # noqa: E402
 
 logger = logging.getLogger("agentmall.web.merchant")
 
@@ -93,6 +94,11 @@ def fmt_time(ts) -> str:
 
 
 templates.env.filters["dt"] = fmt_time
+
+# 类目图：{{ p.category | cat_url }} → /static/img/category/cat-*.jpg。
+# 用户面 app.py 也要注册一次（那边不归本文件管），两边模板写法保持一致；
+# 映射与兜底全在 catimg.py，门户这边不重复造映射表。
+catimg.register(templates.env)
 
 
 def render(request: Request, tpl: str, /, status_code: int = 200, **ctx):

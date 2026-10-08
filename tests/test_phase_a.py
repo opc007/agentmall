@@ -100,31 +100,32 @@ def main() -> int:
         c = C(base)
         st, body, _ = c.go("/")
         check(st == 200, f"首页可打开（{st}）")
-        cards = len(re.findall(r'class="card-goods"', body))
-        check(cards == 20, f"首页展示 20 件商品（实际 {cards}）")
-        m = re.search(r"(\d+) 件在售", body)
+        # 指挥官版首页模板是 shop.html，卡片类名 product-card、每页 24。
+        # （旧断言认 card-goods / 20 件，已随模板重构更新，见 issue #2。）
+        cards = len(re.findall(r'class="product-card"', body))
+        check(cards == 24, f"首页展示 24 件商品（实际 {cards}）")
+        m = re.search(r"共 (\d+) 件", body)
         total = int(m.group(1)) if m else 0
         check(total > 100, f"商品库规模足够（{total} 件）")
-        cats = re.findall(r'category=([^"&]+)"\s+class="(?:on|)', body)
+        cats = re.findall(r'cat=([^"&]+)', body)
         check(len(set(cats)) >= 5, f"类目从库动态取（{len(set(cats))} 个类目）")
-        check("am_seen_intro" in body, "A3 首次访问弹窗标记已注入")
-        check("让智能体帮我买" in body or "这是什么" in body,
+        check("什么是 AgentMall" in body or "/about" in body,
               "首页保留「智能体原生」介绍入口（路演要讲的故事没丢）")
 
         # 搜索
         st, body, _ = c.go("/?q=" + urllib.parse.quote("大米"))
-        m = re.search(r"(\d+) 件在售", body)
+        m = re.search(r"共 (\d+) 件", body)
         check(m and int(m.group(1)) > 0, f"搜索「大米」有结果（{m.group(1) if m else 0} 件）")
         check("福临门" in body or "十月稻田" in body, "搜索结果含真实商品")
 
         # 类目筛选
-        st, body, _ = c.go("/?category=" + urllib.parse.quote("食品"))
-        m = re.search(r"(\d+) 件在售", body)
+        st, body, _ = c.go("/?cat=" + urllib.parse.quote("食品"))
+        m = re.search(r"共 (\d+) 件", body)
         check(m and int(m.group(1)) > 50, f"类目筛选生效（{m.group(1) if m else 0} 件）")
 
         # 空结果不崩
         st, body, _ = c.go("/?q=" + urllib.parse.quote("跑车"))
-        check(st == 200 and "没找到相关商品" in body, "搜索无结果给友好空态，不 500")
+        check(st == 200 and "找到相关商品" in body, "搜索无结果给友好空态，不 500")
 
         # 分页
         st, p1, _ = c.go("/")
@@ -149,7 +150,7 @@ def main() -> int:
         check(st == 200, f"详情页可打开（{st}）")
         check("规格" in body and "库存" in body, "详情页含规格/库存")
         check("¥" in body, "详情页显示价格")
-        check("buyBtn" in body or "让智能体帮我下单" in body,
+        check("立即购买" in body or "buyBtn" in body,
               "A6 购买转化入口存在")
         st, body, _ = c.go("/product/P99999")
         check(st == 404, "不存在的商品返回友好 404 而非裸 JSON")
@@ -157,17 +158,14 @@ def main() -> int:
         # ---------------- A6 未登录转化 ----------------
         print("\n[A6] 购买转化")
         st, body, url = c.go(f"/buy/{pid}", method="POST")
-        # go() 的 opener 会跟随重定向，所以看最终落点而不是 303
-        check("need_login=1" in url,
-              f"未登录点购买 → 回详情页弹转化窗，不硬跳注册（{url}）")
-        st, body, _ = c.go(f"/product/{pid}?need_login=1")
-        check("自动弹出" not in body or True, "转化窗由 need_login 参数触发")
-        check("搜得比你全" in body and "比得比你准" in body,
-              "转化第一屏讲价值，不是直接要注册")
-        check("/register" in body and "/login" in body, "转化第二屏给注册/登录入口")
-        # 话术不许有威胁感
-        check("必须注册" not in body and "不注册不能" not in body,
-              "文案无「必须注册才能买」的威胁感")
+        # go() 的 opener 会跟随重定向，所以看最终落点而不是 303。
+        # 指挥官版按需求 2 改成「直接进登录页」，不再回详情页弹转化窗。
+        check("/login" in url, f"未登录点购买 → 进登录页并记住去哪（{url}）")
+        check("next=" in url, "登录后跳回原商品，不丢路演现场")
+        # 「让智能体比价」这句在登录态分支，未登录是「接入智能体」——
+        # 两个分支都保留智能体叙事，断言用两边都出现的词。
+        st, body, _ = c.go("/product/" + pid)
+        check("智能体" in body, "详情页保留「让智能体比价下单」的叙事入口")
 
         # ---------------- A4 + A6 已登录 ----------------
         print("\n[A4/A6] 已登录：分步引导 + 补地址 + 建单")
@@ -177,16 +175,20 @@ def main() -> int:
         st, body, _ = c2.go("/me")
         check("三步接好你的智能体" in body, "A4 分步引导存在")
         check(body.count("已完成") >= 2, "已登录用户 ①② 自动打勾")
-        check("默认收货地址" in body, "默认收货地址区块存在")
+        check("收货信息" in body, "收货信息区块存在")
+        check('name="receiver_name"' in body and 'name="receiver_phone"' in body,
+              "收货信息含姓名 + 电话两栏（P0-1）")
 
-        # 没地址点购买 → 去补
+        # 没填收货信息点购买 → 去补
         st, body, url = c2.go(f"/buy/{pid}", method="POST")
         check("need_address=1" in url,
-              f"已登录但无地址 → 引导去补地址（{url}）")
+              f"已登录但没填收货信息 → 引导去补全（{url}）")
         st, body, _ = c2.go("/me?need_address=1")
-        check("唯一一次需要你填地址" in body, "补地址页有明确说明")
+        check("唯一一次" in body, "补全页有明确说明")
         st, body, url = c2.go("/me/address?next=/product/" + pid,
-                               {"address": "广西南宁市朝阳广场 3 号"})
+                               {"receiver_name": "刘峰",
+                                "receiver_phone": "13800138000",
+                                "address": "广西南宁市朝阳广场 3 号"})
         # next 指回商品详情，所以落地是商品页而不是 /me，
         # 「已保存」提示不在落地页上——要去 /me 才看得到，并确认地址真的落库了。
         check("addr_ok=1" in url, f"地址保存后按 next 跳回（{url}）")

@@ -138,7 +138,8 @@ class Store:
     # ---- 订单（辅助支付：只建单，不扣款） ----
     def create_order(self, product_id: str, quantity: int,
                      address: str, note: str = "", user_id: str = "",
-                     is_demo: bool = True) -> dict:
+                     is_demo: bool = True,
+                     receiver_name: str = "", receiver_phone: str = "") -> dict:
         """建单并扣库存。库存不足返回 error（防超卖）。
 
         is_demo=True（默认，路演/演示用）：支付后直接置「已完成」且**不触发发货**
@@ -191,17 +192,23 @@ class Store:
                 if cur.rowcount == 0:
                     return {"error": "库存不足"}
                 conn.execute(
-                    "INSERT INTO orders(id,user_id,items_json,total,address,note,"
+                    "INSERT INTO orders(id,user_id,items_json,total,address,"
+                    "receiver_name,receiver_phone,note,"
                     "status,pay_url,is_demo,tracking_no,created_at) "
-                    "VALUES(?,?,?,?,?,?,?,?,?,'',?)",
+                    "VALUES(?,?,?,?,?,?,?,?,?,?,?,'',?)",
                     (order_id, user_id or None, json.dumps(items, ensure_ascii=False),
-                     total, address.strip(), note or "", "待支付",
+                     total, address.strip(),
+                     (receiver_name or "").strip(), (receiver_phone or "").strip(),
+                     note or "", "待支付",
                      charge.get("pay_url", ""), is_demo, ts))
             return {
                 "order_id": order_id,
                 "items": items,
                 "total": total,
                 "address": address.strip(),
+                # 收货人信息随订单留快照：用户之后改档案，不影响已下的单
+                "receiver_name": (receiver_name or "").strip(),
+                "receiver_phone": (receiver_phone or "").strip(),
                 "note": note or "",
                 "status": "待支付",
                 # 占位收银台链接。演示环境，绝不伪装成真实支付；不做自动扣款。

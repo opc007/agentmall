@@ -317,3 +317,56 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 .buy-row { display: flex; gap: 10px; margin-top: 16px; align-items: stretch; }
 .buy-row .qty { width: 76px; padding: 10px; font-size: 1rem; border: 1px solid var(--line); border-radius: var(--radius); }
 .buy-hint { margin-top: 10px; font-size: .85rem; color: var(--ink-soft); }
+
+/* ===== 类目缩略图（Phase A P0：商品卡片/详情页加图） =====
+   只**追加**，不改上面任何既有规则。
+   图源统一由模板的 | cat_url 过滤器给出（agentmall/web/catimg.py），
+   这里只管尺寸与裁剪——图坏了浏览器 onerror 会兜到 cat-shipin.jpg，
+   但 CSS 这边必须保证「不管什么图，卡片高度都不能跳」。
+
+   .g-img  商品卡片图：一律正方形 1:1 + object-fit:cover。
+           为什么必须锁死比例：源图 1600×1600，卡片在手机上是两列网格，
+           一旦高度由图决定，长图/方图混排会把整页网格撑得跳来跳去。 */
+.g-img {
+  display: block; width: 100%; height: auto;
+  aspect-ratio: 1 / 1;            /* 正方形：现代浏览器按比例给高度 */
+  object-fit: cover;              /* 兜住不支持 aspect-ratio 的老浏览器 */
+  background: #f5f7f6;           /* 图片还没加载完时的底色，不闪白 */
+  border-radius: var(--radius);
+  flex: 0 0 auto;                 /* 卡片是 flex 容器，别让图被压扁 */
+  margin-bottom: 2px;
+}
+
+/* .pd-img  商品详情页顶部大图：宽度自适应，max-height 封顶。
+   手机上不封顶的话一张 1600px 的图能把「立即购买」按钮顶到屏幕外。 */
+.pd-img {
+  display: block; width: 100%; height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  background: #f5f7f6;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+}
+
+/* .m-img  商户门户商品列表小图：44px 方形缩略图，不跟文字抢地方。 */
+.m-img {
+  display: block; width: 44px; height: 44px;
+  object-fit: cover;
+  background: #f5f7f6;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  flex: 0 0 auto;
+}
+.m-list { display: flex; flex-direction: column; gap: 8px; }
+.m-row { display: flex; align-items: center; gap: 10px; }
+.m-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-price { font-weight: 700; white-space: nowrap; }
+
+/* 手机端（路演第 7 步就是手机扫码看商城）：两列卡片，图必须是正方形。
+   这里再显式写一遍 1:1，是为了让不支持 aspect-ratio 的老 Safari
+   （iOS 14 以下）也拿到确定的高度，不至于被长图撑变形。 */
+@media (max-width: 480px) {
+  .g-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; height: auto; }
+  .pd-img { max-height: 190px; }
+}

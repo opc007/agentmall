@@ -26,6 +26,11 @@
 <div class="product-grid">
   {% for p in products %}
   <a class="product-card" href="/product/{{ p.id }}">
+    {# 类目图：文件名全部走 cat_url 映射（agentmall/web/catimg.py），绝不写死；
+       loading=lazy 是硬要求——首页一页 24 张，不懒加载手机会卡；
+       onerror 兜底防止个别图片损坏出现破图。 #}
+    <img class="g-img" src="{{ p.category | cat_url }}" alt="{{ p.category }}" loading="lazy"
+         onerror="this.onerror=null;this.src='/static/img/category/cat-shipin.jpg'">
     <span class="p-cat">{{ p.category }}</span>
     <span class="p-name">{{ p.name }}</span>
     <span class="p-specs">{{ p.specs }}</span>

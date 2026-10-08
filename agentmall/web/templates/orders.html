@@ -33,7 +33,7 @@
     <tr data-order-id="{{ o.order_id }}">
       <td><code>{{ o.order_id }}</code>{% if o.is_demo %}<span class="tag-demo">演示</span>{% endif %}</td>
       <td class="cell-items">{{ o.items_brief }}</td>
-      <td class="muted">{{ o.address }}</td>
+      <td class="muted">{% if o.receiver_name %}<b>{{ o.receiver_name }}</b>　{{ o.receiver_phone }}<br>{% endif %}{{ o.address }}</td>
       <td class="num">¥{{ o.total | money }}</td>
       <td class="cell-status">
         <span class="badge {{ 'badge-wait' if o.payable else 'badge-done' }}">{{ o.status }}</span>
@@ -117,7 +117,9 @@ function buildRow(o) {
   tr.innerHTML =
     '<td><code>' + esc(o.order_id) + '</code>' + (o.is_demo ? '<span class="tag-demo">演示</span>' : '') + '</td>' +
     '<td class="cell-items">' + esc(o.items_brief) + '</td>' +
-    '<td class="muted">' + esc(o.address) + '</td>' +
+    '<td class="muted">' + (o.receiver_name
+        ? esc(o.receiver_name) + '　' + esc(o.receiver_phone) + '<br>' : '')
+      + esc(o.address) + '</td>' +
     '<td class="num">' + fmtMoney(o.total) + '</td>' +
     '<td class="cell-status"><span class="badge ' + (STATUS_TONE[o.status] || 'badge-done') + '">' + esc(o.status) + '</span></td>' +
     '<td class="muted">' + esc(fmtTs(o.created_at)) + '</td>' +

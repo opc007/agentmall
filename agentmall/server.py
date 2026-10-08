@@ -105,6 +105,25 @@ def get_product(product_id: str) -> dict:
     return store.get(product_id)
 
 
+def _receiver_of(user_id: str) -> tuple[str, str]:
+    """从用户档案取收货人姓名 / 电话。档案没填就返回空串，不猜、不编。"""
+    if not user_id:
+        return "", ""
+    try:
+        conn = db.connect()
+        try:
+            row = conn.execute(
+                "SELECT receiver_name, receiver_phone FROM users WHERE id=?",
+                (user_id,)).fetchone()
+        finally:
+            conn.close()
+    except Exception:
+        return "", ""
+    if row is None:
+        return "", ""
+    return (row["receiver_name"] or ""), (row["receiver_phone"] or "")
+
+
 @_reg("create_order")
 def create_order(product_id: str, quantity: int, address: str,
                  note: str = "") -> dict:
@@ -122,7 +141,13 @@ def create_order(product_id: str, quantity: int, address: str,
     uid = ""
     if actor and actor.get("actor_id") not in (None, "", "anonymous"):
         uid = str(actor["actor_id"])
-    return store.create_order(product_id, quantity, address, note, user_id=uid)
+    # Phase A P0：智能体代用户下单时，把用户档案里的收货人姓名/电话带上，
+    # 否则订单只有一段地址文本、没有联系人，下单流程走不通。
+    # **地址参数仍以调用方传的为准**（智能体可以按用户当次口述临时改地址），
+    # 但姓名/电话这类用户不会在对话里重复报的东西，从档案补。
+    rname, rphone = _receiver_of(uid)
+    return store.create_order(product_id, quantity, address, note, user_id=uid,
+                              receiver_name=rname, receiver_phone=rphone)
 
 
 @_reg("get_order")

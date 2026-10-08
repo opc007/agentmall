@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import re
 import struct
 import time
 import zlib
@@ -34,6 +36,7 @@ from fastapi.templating import Jinja2Templates
 
 from .. import auth, db, payment
 from ..store import get_store
+from . import catimg
 
 BASE = Path(__file__).resolve().parent
 TEMPLATE_DIR = BASE / "templates"
@@ -42,6 +45,8 @@ STATIC_DIR = BASE / "static"
 logger = logging.getLogger("agentmall.web")
 
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
+# 类目缩略图过滤器：{{ product.category | cat_url }}（映射与兜底见 catimg.py）
+catimg.register(templates.env)
 
 # ---- cookie / 会话（demo 简化，见模块 docstring 的生产替换说明）----
 COOKIE_NAME = "agentmall_key"
@@ -109,6 +114,31 @@ def items_total_qty(items) -> int:
     return total
 
 
+PHONE_RE = re.compile(r"^1[3-9]\d{9}$")
+
+
+def receiver_of(user: dict | None) -> tuple[dict, list[str]]:
+    """取用户档案里的收货信息，返回 (信息, 缺失项列表)。
+
+    演示环境已有数据可能只填了地址没填姓名电话（这批字段是后加的）。
+    **缺项不静默放过**——下单前必须补全，否则订单发不出去。
+    """
+    user = user or {}
+    info = {
+        "address": (user.get("address") or "").strip(),
+        "receiver_name": (user.get("receiver_name") or "").strip(),
+        "receiver_phone": (user.get("receiver_phone") or "").strip(),
+    }
+    missing = []
+    if not info["receiver_name"]:
+        missing.append("收货人姓名")
+    if not PHONE_RE.match(info["receiver_phone"]):
+        missing.append("联系电话（11 位手机号）")
+    if len(info["address"]) < 4:
+        missing.append("收货地址")
+    return info, missing
+
+
 def view_order(order: dict) -> dict:
     """把 store 的订单 dict 整成「模板友好」的视图对象。
 
@@ -154,6 +184,8 @@ def view_order(order: dict) -> dict:
         "payable": status == "待支付",
         "total": total,
         "address": order.get("address", ""),
+        "receiver_name": order.get("receiver_name", ""),
+        "receiver_phone": order.get("receiver_phone", ""),
         "created_at": order.get("created_at", 0),
         "is_demo": bool(order.get("is_demo", True)),
         "pay_url": order.get("pay_url", ""),
@@ -235,12 +267,16 @@ def current_user(request: Request) -> dict | None:
     }
     if user["role"] == auth.ROLE_USER and user["user_id"]:
         with closing(db.connect()) as conn:  # 短连接，用完立刻关
-            row = conn.execute("SELECT username, api_key FROM users WHERE id=?",
-                               (user["user_id"],)).fetchone()
+            row = conn.execute(
+                "SELECT username, api_key, address, receiver_name, receiver_phone "
+                "FROM users WHERE id=?", (user["user_id"],)).fetchone()
         if row is None:
             return None  # key 有效但用户已被删
         user["username"] = row["username"]
         user["api_key"] = row["api_key"]
+        user["address"] = row["address"] or ""
+        user["receiver_name"] = row["receiver_name"] or ""
+        user["receiver_phone"] = row["receiver_phone"] or ""
     return user
 
 
@@ -391,26 +427,75 @@ def product_detail(request: Request, product_id: str):
 @router.post("/buy/{product_id}", response_class=HTMLResponse)
 def buy_now(request: Request, product_id: str,
             quantity: int = Form(1)):
-    """网页直接购买：登录用户建单 → 跳收银台；未登录 → 去登录（带回跳）。
+    """网页直接购买：登录用户建单 → 跳收银台。
 
-    演示环境：收货地址用占位（智能体下单时填真实地址），不做传统地址表单。
+    收货信息（姓名 + 电话 + 地址）取自用户档案，在个人中心填一次即可，
+    这里**不做传统地址表单**（产品决策：地址由智能体下单时提供）。
+    信息不全时**跳去补全而不是用占位符硬下单**——占着「演示地址」建出来的单
+    收不了货，是 2026-10-08 路演实测反馈的真实问题。
     """
     try:
         user = require_user(request)
     except _Redirect:
-        # 回跳到商品详情页（buy 是 POST，回跳到它会 405）
         return RedirectResponse(f"/login?next={quote('/product/' + product_id)}",
                                 status_code=303)
     st = get_store()
+    info, missing = receiver_of(user)
+    if missing:
+        return RedirectResponse(
+            f"/me?need_address=1&missing={quote('、'.join(missing))}"
+            f"&next={quote('/product/' + product_id)}", status_code=303)
     order = st.create_order(
-        product_id, quantity,
-        address="演示地址（智能体下单时填写真实收货地址）",
+        product_id, quantity, address=info["address"],
+        receiver_name=info["receiver_name"], receiver_phone=info["receiver_phone"],
         user_id=user["user_id"], is_demo=True)
     if order.get("error"):
         p = st.get(product_id)
         return render(request, "product.html", user, p=p,
                       error=order["error"], status_code=400)
     return RedirectResponse(f"/pay/{order_id_of(order)}", status_code=303)
+
+
+@router.post("/me/address")
+def save_receiver(request: Request, receiver_name: str = Form(""),
+                  receiver_phone: str = Form(""), address: str = Form("")):
+    """保存收货信息（个人中心）。姓名 + 11 位手机号 + 地址，三项都要。"""
+    try:
+        user = require_user(request)
+    except _Redirect as r:
+        return RedirectResponse(r.url, status_code=303)
+    name = (receiver_name or "").strip()
+    phone = (receiver_phone or "").strip().replace(" ", "")
+    addr = (address or "").strip()
+    problems = []
+    if not name:
+        problems.append("请填收货人姓名")
+    elif len(name) > 20:
+        problems.append("收货人姓名过长")
+    if not PHONE_RE.match(phone):
+        problems.append("请填 11 位手机号")
+    if len(addr) < 4:
+        problems.append("请填收货地址")
+    if problems:
+        return RedirectResponse(
+            f"/me?addr_err={quote('；'.join(problems))}"
+            f"&next={quote(request.query_params.get('next', ''))}", status_code=303)
+    with closing(db.connect()) as conn:
+        with conn:
+            conn.execute(
+                "UPDATE users SET receiver_name=?, receiver_phone=?, address=? "
+                "WHERE id=?", (name, phone, addr, user["user_id"]))
+    nxt = safe_next(request.query_params.get("next"), "/me")
+    sep = "&" if "?" in nxt else "?"
+    return RedirectResponse(f"{nxt}{sep}addr_ok=1", status_code=303)
+
+
+@router.get("/merchant", response_class=HTMLResponse)
+def merchant_portal(request: Request):
+    """买家商城里点「我是商家」→ 跳到商户门户（独立进程，同管理后台的理由）。"""
+    port = os.environ.get("AGENTMALL_MERCHANT_PORT", "8003")
+    host = request.url.hostname or "127.0.0.1"
+    return RedirectResponse(f"http://{host}:{port}/", status_code=302)
 
 
 @router.get("/register", response_class=HTMLResponse)
@@ -479,11 +564,19 @@ def me(request: Request):
     cfg = mcp_config(base_url, user["api_key"])
     cfg_text = json.dumps(cfg, ensure_ascii=False, indent=2)
     orders, from_pool = orders_for_user(user["user_id"], limit=10)
+    info, missing = receiver_of(user)
     return render(request, "me.html", user,
                   mcp_cfg=cfg, mcp_cfg_text=cfg_text, base_url=base_url,
                   mcp_endpoint=f"{base_url}/mcp",
                   recent_orders=[view_order(o) for o in orders],
-                  from_pool=from_pool)
+                  from_pool=from_pool,
+                  # Phase A P0：点「让智能体帮我下单」时收货信息不全 → 回来补全
+                  receiver=info, missing=missing,
+                  need_address=request.query_params.get("need_address") == "1",
+                  missing_hint=request.query_params.get("missing", ""),
+                  addr_err=request.query_params.get("addr_err", ""),
+                  addr_ok=request.query_params.get("addr_ok") == "1",
+                  next_url=safe_next(request.query_params.get("next"), ""))
 
 
 @router.get("/orders", response_class=HTMLResponse)

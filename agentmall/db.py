@@ -46,6 +46,9 @@ CREATE TABLE IF NOT EXISTS users (
     -- **不做传统收货地址表单**，所以地址存在用户档案里（个人中心可改），
     -- 下单时由智能体的 MCP 建单参数提供，网页侧只作默认值。
     address       TEXT NOT NULL DEFAULT '',
+    -- Phase A P0：地址光有文本不够，下单要能联系上人（路演实测反馈）
+    receiver_name  TEXT NOT NULL DEFAULT '',
+    receiver_phone TEXT NOT NULL DEFAULT '',
     created_at    INTEGER NOT NULL
 );
 
@@ -72,6 +75,8 @@ CREATE TABLE IF NOT EXISTS orders (
     items_json TEXT NOT NULL,
     total      REAL NOT NULL,
     address    TEXT NOT NULL,
+    receiver_name  TEXT NOT NULL DEFAULT '',
+    receiver_phone TEXT NOT NULL DEFAULT '',
     note       TEXT NOT NULL DEFAULT '',
     status     TEXT NOT NULL DEFAULT '待支付',
     pay_url    TEXT NOT NULL DEFAULT '',
@@ -168,6 +173,12 @@ def _migrate(conn: sqlite3.Connection) -> None:
     wanted = {
         "users": [
             ("address", "TEXT NOT NULL DEFAULT ''"),
+            ("receiver_name", "TEXT NOT NULL DEFAULT ''"),
+            ("receiver_phone", "TEXT NOT NULL DEFAULT ''"),
+        ],
+        "orders": [
+            ("receiver_name", "TEXT NOT NULL DEFAULT ''"),
+            ("receiver_phone", "TEXT NOT NULL DEFAULT ''"),
         ],
         "merchants": [
             ("password_hash", "TEXT NOT NULL DEFAULT ''"),

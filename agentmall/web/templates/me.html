@@ -32,40 +32,46 @@
   </p>
 </section>
 
-<!-- ===== 默认收货地址（Phase A：不做传统地址表单，地址存在这里） ===== -->
+<!-- ===== 收货信息（Phase A P0：路演实测「只有地址没有姓名电话，下单走不通」） ===== -->
 <section class="panel">
-  <h2>📍 默认收货地址</h2>
+  <h2>📦 收货信息</h2>
   {% if need_address %}
   <div class="alert alert-warn">
-    你点了「让智能体帮我下单」，但还没填默认收货地址。
-    <b>这是唯一一次需要你填地址的地方</b>——之后智能体下单时会自己带地址。
+    <b>下单前还差这些信息：{{ missing_hint or '、'.join(missing) }}</b><br>
+    这是<b>唯一一次</b>需要你填的地方——填完存进档案，之后网页下单和智能体下单都会自动带上。
   </div>
   {% endif %}
-  {% if user.get('address') %}
-  <p class="big-num" style="margin:0">{{ user.get('address') }}</p>
-  {% else %}
-  <p class="muted">还没设置。商城里点「让智能体帮我下单」时会用到。</p>
+  {% if addr_err %}<div class="alert alert-error">{{ addr_err }}</div>{% endif %}
+  {% if addr_ok %}<div class="alert alert-info">已保存 ✓</div>{% endif %}
+
+  {% if not missing %}
+  <p style="margin:8px 0 0;font-size:15px">
+    <b>{{ receiver.receiver_name }}</b>　{{ receiver.receiver_phone }}<br>
+    <span class="muted">{{ receiver.address }}</span>
+  </p>
+  <p class="muted small" style="margin:6px 0 14px">已保存，下单时会自动带上。</p>
   {% endif %}
-  <form method="post" action="/me/address" style="margin-top:12px;max-width:520px">
-    {% if need_address and request.query_params.get('next') %}
-    <input type="hidden" name="next" value="{{ request.query_params.get('next') }}">
-    {% endif %}
-    <div class="form-row" style="display:flex;gap:8px">
-      <input name="address" value="{{ user.get('address', '') }}"
-             placeholder="例如：广西南宁市朝阳广场 3 号" style="flex:1;padding:10px 12px;
-             border:1px solid #d8dee9;border-radius:8px;font-size:14px">
+
+  <form method="post" action="/me/address" style="max-width:520px">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input name="receiver_name" value="{{ receiver.receiver_name }}"
+             placeholder="收货人姓名" required
+             style="flex:1;padding:10px 12px;border:1px solid #d8dee9;border-radius:8px;font-size:14px">
+      <input name="receiver_phone" value="{{ receiver.receiver_phone }}"
+             placeholder="11 位手机号" required inputmode="numeric" maxlength="11"
+             style="flex:1;padding:10px 12px;border:1px solid #d8dee9;border-radius:8px;font-size:14px">
+    </div>
+    <div style="display:flex;gap:8px">
+      <input name="address" value="{{ receiver.address }}"
+             placeholder="收货地址，例如：广西南宁市朝阳广场 3 号" required
+             style="flex:1;padding:10px 12px;border:1px solid #d8dee9;border-radius:8px;font-size:14px">
       <button class="btn" type="submit">保存</button>
     </div>
   </form>
   <p class="muted small" style="margin-top:8px">
-    演示环境可用「广西南宁市朝阳广场」这类地址；真实环境由智能体下单时提供。
+    智能体通过 MCP 下单时，也会自动带上这里的姓名和电话（订单里留的是下单当时的快照）。
   </p>
-  {% if request.query_params.get('addr_err') %}
-  <div class="alert alert-error">{{ request.query_params.get('addr_err') }}</div>
-  {% endif %}
-  {% if request.query_params.get('addr_ok') %}
-  <div class="alert alert-info">已保存 ✓</div>
-  {% endif %}
 </section>
 
 <!-- ===== 核心：MCP 接入点，一键复制 ===== -->

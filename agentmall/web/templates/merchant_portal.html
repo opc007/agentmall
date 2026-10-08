@@ -28,6 +28,29 @@
   </p>
 </section>
 
+<!-- ===== 我的商品（列表 + 类目缩略图） =====
+     merchant_app.py 的门户路由目前没有往模板传商品列表，所以整块是拿
+     products 变量包着的空态：路由那边把本商户商品传进来就自动出图，
+     传不进来就不渲染，绝不报错、也不占版面。
+     注意：Jinja 不认 HTML 注释，注释里写大括号标签照样会被解析成标签，
+     踩过一次（注释里的 if 没闭合直接把整页模板编译搞挂）。
+     样式 .m-img / .m-row 在 static/style.css 里已就位。 -->
+{% if products %}
+<section class="card">
+  <h2>🛍️ 我的商品（{{ products|length }} 件）</h2>
+  <div class="m-list">
+    {% for p in products %}
+    <div class="m-row">
+      <img class="m-img" src="{{ p.category | cat_url }}" alt="{{ p.category }}" loading="lazy"
+           onerror="this.onerror=null;this.src='/static/img/category/cat-shipin.jpg'">
+      <div class="m-name">{{ p.name }}</div>
+      <div class="m-price">¥{{ '%.2f'|format(p.price) }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
 <!-- ===== 核心：MCP 接入点，一键复制 ===== -->
 <section class="card">
   <h2><span class="step">①</span>MCP 接入点（复制这段 JSON，粘进你的 AI 客户端）</h2>

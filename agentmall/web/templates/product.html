@@ -5,6 +5,10 @@
 <p style="margin-bottom: 10px;"><a href="/" style="color: var(--ink-soft);">← 返回商城</a></p>
 
 <div class="product-detail">
+  {# 顶部大图：宽度自适应 + max-height 封顶，别在手机屏上撑爆整屏。
+     onerror 兜底同卡片（cat-shipin.jpg 恒存在）。 #}
+  <img class="pd-img" src="{{ p.category | cat_url }}" alt="{{ p.category }}"
+       onerror="this.onerror=null;this.src='/static/img/category/cat-shipin.jpg'">
   <span class="p-cat">{{ p.category }}</span>
   <h1>{{ p.name }}</h1>
   <p class="p-specs">规格：{{ p.specs }} · 单位：{{ p.unit }}</p>
