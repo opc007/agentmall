@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import json
-import os
 import logging
 import struct
 import time
@@ -28,7 +27,7 @@ from contextlib import asynccontextmanager, closing
 from pathlib import Path
 from urllib.parse import quote
 
-from fastapi import APIRouter, FastAPI, Form, Request
+from fastapi import APIRouter, FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -236,14 +235,12 @@ def current_user(request: Request) -> dict | None:
     }
     if user["role"] == auth.ROLE_USER and user["user_id"]:
         with closing(db.connect()) as conn:  # 短连接，用完立刻关
-            row = conn.execute(
-                "SELECT username, api_key, address FROM users WHERE id=?",
-                (user["user_id"],)).fetchone()
+            row = conn.execute("SELECT username, api_key FROM users WHERE id=?",
+                               (user["user_id"],)).fetchone()
         if row is None:
             return None  # key 有效但用户已被删
         user["username"] = row["username"]
         user["api_key"] = row["api_key"]
-        user["address"] = row["address"] or ""
     return user
 
 
@@ -355,126 +352,65 @@ def healthz() -> JSONResponse:
 
 
 @router.get("/", response_class=HTMLResponse)
-def index(request: Request,
-          q: str = "",
-          category: str = "",
-          page: int = 1):
-    """首页 = 传统商城商品流（Phase A）。
-
-    之前这里是项目介绍页；介绍内容没丢，挪到 `/about`，首页底部也留折叠区。
-    """
-    user = current_user(request)
-    store = get_store()
-    per_page = 20
+def index(request: Request, q: str = "", cat: str = "", page: int = 1):
+    """商城首页：传统货架式商品流（搜索 / 类目 / 分页）。老介绍页移到 /about。"""
     page = max(int(page or 1), 1)
-    kw = (q or "").strip()
-    cat = (category or "").strip()
-
-    items = store.search(keyword=kw, category=cat or None,
-                         limit=per_page, offset=(page - 1) * per_page)
-    total = store.count(keyword=kw, category=cat or None)
+    per_page = 24
+    st = get_store()
+    # 类目列表（去重，按商品数倒序）
+    with closing(db.connect()) as conn:
+        cats = [r[0] for r in conn.execute(
+            "SELECT category, COUNT(*) c FROM products "
+            "WHERE status='在售' GROUP BY category ORDER BY c DESC")]
+    # 取全部再在内存分页（演示规模，简单可靠）
+    items = st.search(keyword=q, category=cat or None, limit=5000)
+    total = len(items)
     pages = max((total + per_page - 1) // per_page, 1)
     page = min(page, pages)
-
-    def page_url(n: int) -> str:
-        params = []
-        if kw:
-            params.append("q=" + quote(kw))
-        if cat:
-            params.append("category=" + quote(cat))
-        if n > 1:
-            params.append(f"page={n}")
-        return "/?" + "&".join(params) if params else "/"
-
-    return render(request, "index.html", user,
-                  q=kw, category=cat, items=items, total=total,
-                  page=page, pages=pages, per_page=per_page,
-                  categories=store.list_categories(),
-                  page_url=page_url,
-                  prev_url=page_url(page - 1) if page > 1 else "",
-                  next_url=page_url(page + 1) if page < pages else "")
+    chunk = items[(page - 1) * per_page: page * per_page]
+    return render(request, "shop.html", current_user(request),
+                  products=chunk, categories=cats, q=q, cat=cat,
+                  page=page, pages=pages, total=total)
 
 
 @router.get("/about", response_class=HTMLResponse)
 def about(request: Request):
-    """项目介绍（从原首页挪来的「智能体原生」故事，路演要讲）。"""
+    """项目介绍（原首页内容）：智能体原生商城说明 + 演示边界。"""
     return render(request, "about.html", current_user(request))
-
-
-@router.get("/merchant", response_class=HTMLResponse)
-def merchant_portal(request: Request):
-    """买家商城里点「我是商家」→ 跳到商户门户。
-
-    商户门户是**独立进程**（agentmall/web/merchant_app.py，默认 :8003），
-    和管理后台一样的理由——三权分立，用户面不该塞商户的功能。
-    端口可用 AGENTMALL_MERCHANT_PORT 改。
-    """
-    port = os.environ.get("AGENTMALL_MERCHANT_PORT", "8003")
-    return RedirectResponse(f"http://{request.url.hostname or '127.0.0.1'}:{port}/",
-                            status_code=302)
 
 
 @router.get("/product/{product_id}", response_class=HTMLResponse)
 def product_detail(request: Request, product_id: str):
-    """商品详情页 → 「让智能体帮我买」进转化流程。"""
-    user = current_user(request)
-    product = get_store().get(product_id)
-    if "error" in product:
-        return render(request, "error_404.html", user, status_code=404,
-                      detail=f"商品 {product_id} 不存在或已下架")
-    return render(request, "product.html", user, product=product)
+    """商品详情页。"""
+    p = get_store().get(product_id)
+    if p.get("error"):
+        raise HTTPException(status_code=404, detail=p["error"])
+    return render(request, "product.html", current_user(request), p=p)
 
 
-@router.post("/buy/{product_id}")
-def buy(request: Request, product_id: str):
-    """「让智能体帮我买」：已登录直接建单并跳收银台；未登录走转化弹窗。
+@router.post("/buy/{product_id}", response_class=HTMLResponse)
+def buy_now(request: Request, product_id: str,
+            quantity: int = Form(1)):
+    """网页直接购买：登录用户建单 → 跳收银台；未登录 → 去登录（带回跳）。
 
-    产品决策：**不做传统收货地址表单**。地址取用户档案里的默认收货地址
-    （个人中心可改），真实下单地址最终由智能体的 MCP 建单参数提供。
+    演示环境：收货地址用占位（智能体下单时填真实地址），不做传统地址表单。
     """
-    user = current_user(request)
-    store = get_store()
-    product = store.get(product_id)
-    if "error" in product:
-        return RedirectResponse(f"/product/{product_id}", status_code=303)
-    if not user or user["role"] != auth.ROLE_USER:
-        # 未登录 → 回详情页，前端弹转化窗（话术在 product.html 里）
-        return RedirectResponse(f"/product/{product_id}?need_login=1", status_code=303)
-
-    address = (user.get("address") or "").strip()
-    if not address:
-        # 没有默认地址 → 不硬编一个假地址，去个人中心补
-        return RedirectResponse(
-            f"/me?need_address=1&next={quote('/product/' + product_id)}",
-            status_code=303)
-
-    order = store.create_order(product_id, 1, address, user_id=user["user_id"])
-    if "error" in order:
-        return RedirectResponse(
-            f"/product/{product_id}?buy_err={quote(order['error'])}",
-            status_code=303)
-    return RedirectResponse(f"/pay/{order['order_id']}", status_code=303)
-
-
-@router.post("/me/address")
-def save_address(request: Request, address: str = Form("")):
-    """保存默认收货地址（个人中心）。"""
     try:
         user = require_user(request)
-    except _Redirect as r:
-        return RedirectResponse(r.url, status_code=303)
-    addr = (address or "").strip()
-    if len(addr) < 4:
-        return RedirectResponse("/me?addr_err=地址太短", status_code=303)
-    if len(addr) > 120:
-        return RedirectResponse("/me?addr_err=地址过长", status_code=303)
-    with closing(db.connect()) as conn:
-        with conn:
-            conn.execute("UPDATE users SET address=? WHERE id=?",
-                         (addr, user["user_id"]))
-    nxt = safe_next(request.query_params.get("next"), "/me")
-    sep = "&" if "?" in nxt else "?"
-    return RedirectResponse(f"{nxt}{sep}addr_ok=1", status_code=303)
+    except _Redirect:
+        # 回跳到商品详情页（buy 是 POST，回跳到它会 405）
+        return RedirectResponse(f"/login?next={quote('/product/' + product_id)}",
+                                status_code=303)
+    st = get_store()
+    order = st.create_order(
+        product_id, quantity,
+        address="演示地址（智能体下单时填写真实收货地址）",
+        user_id=user["user_id"], is_demo=True)
+    if order.get("error"):
+        p = st.get(product_id)
+        return render(request, "product.html", user, p=p,
+                      error=order["error"], status_code=400)
+    return RedirectResponse(f"/pay/{order_id_of(order)}", status_code=303)
 
 
 @router.get("/register", response_class=HTMLResponse)
@@ -547,10 +483,7 @@ def me(request: Request):
                   mcp_cfg=cfg, mcp_cfg_text=cfg_text, base_url=base_url,
                   mcp_endpoint=f"{base_url}/mcp",
                   recent_orders=[view_order(o) for o in orders],
-                  from_pool=from_pool,
-                  # Phase A：用户没填默认地址就点了「让智能体帮我下单」时，
-                  # 回个人中心补地址，补完再跳回商品详情
-                  need_address=request.query_params.get("need_address") == "1")
+                  from_pool=from_pool)
 
 
 @router.get("/orders", response_class=HTMLResponse)
